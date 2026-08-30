@@ -1,0 +1,27 @@
+<div class="editor-container">
+  <h1>Editor de Cartas</h1>
+
+  <div *ngIf="loading" class="loading">
+    Cargando...
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <strong>Error:</strong> {{ error }}
+  </div>
+
+  <div *ngIf="!loading && config && carta" class="editor-layout">
+    <div class="editor-left">
+      <app-form 
+        [carta]="carta"
+        [config]="config"
+        (cartaChanged)="onCartaChanged($event)"
+        (guardar)="onGuardar($event)"
+        [guardando]="guardando"
+      ></app-form>
+    </div>
+
+    <div class="editor-right">
+      <app-preview [carta]="carta"></app-preview>
+    </div>
+  </div>
+</div>

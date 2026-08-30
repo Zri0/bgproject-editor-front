@@ -1,0 +1,73 @@
+<div class="preview-container">
+  <h2>Vista Previa</h2>
+  
+  <div class="card">
+    <!-- Header con imagen -->
+    <div class="card-header" *ngIf="carta.imagen">
+      <img [src]="carta.imagen" alt="Card image" />
+    </div>
+
+    <!-- Título -->
+    <div class="card-title">
+      <h3>{{ carta.titulo || '(Título)' }}</h3>
+    </div>
+
+    <!-- Razas -->
+    <div class="card-races" *ngIf="carta.razas && carta.razas.length > 0">
+      <span *ngFor="let raza of carta.razas" class="race-badge">{{ raza }}</span>
+    </div>
+
+    <!-- Atributos principales -->
+    <div class="card-stats">
+      <div class="stat">
+        <span class="stat-label">Nivel</span>
+        <span class="stat-value">{{ carta.nivel }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Vida</span>
+        <span class="stat-value">{{ carta.vida }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Ataque</span>
+        <span class="stat-value">{{ carta.ataque }}</span>
+      </div>
+    </div>
+
+    <!-- Descripción -->
+    <div class="card-description" *ngIf="carta.descripcion">
+      <p>{{ carta.descripcion }}</p>
+    </div>
+
+    <!-- Buffs -->
+    <div class="card-buffs" *ngIf="carta.buffs_aplicados && carta.buffs_aplicados.length > 0">
+      <div class="effects-title">Buffs</div>
+      <div class="effects-list">
+        <div *ngFor="let buff of carta.buffs_aplicados" class="effect-item buff">
+          <strong>{{ buff.buff_detail?.name || 'Buff #' + buff.buff }}</strong>
+          <small *ngIf="buff.parametros | keyvalue as params">
+            <span *ngFor="let p of params" class="param">{{ p.key }}: {{ p.value }}</span>
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Efectos -->
+    <div class="card-efectos" *ngIf="carta.efectos && carta.efectos.length > 0">
+      <div class="effects-title">Efectos</div>
+      <div class="effects-list">
+        <div *ngFor="let efecto of carta.efectos" class="effect-item efecto">
+          <strong>{{ efecto.efecto_detail?.name || 'Efecto #' + efecto.efecto }}</strong>
+          <small *ngIf="efecto.parametros | keyvalue as params">
+            <span *ngFor="let p of params" class="param">{{ p.key }}: {{ p.value }}</span>
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="card-footer">
+      <small *ngIf="carta.created_at">Creada: {{ carta.created_at | date: 'short' }}</small>
+      <small *ngIf="carta.updated_at">Actualizada: {{ carta.updated_at | date: 'short' }}</small>
+    </div>
+  </div>
+</div>
