@@ -53,8 +53,8 @@ legend {
   gap: 15px;
 }
 
-/* Razas */
-.razas-selected {
+/* Races */
+.races-selected {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -63,7 +63,7 @@ legend {
   align-content: flex-start;
 }
 
-.raza-tag {
+.race-tag {
   background: #e3f2fd;
   border: 1px solid #90caf9;
   border-radius: 20px;
@@ -74,7 +74,7 @@ legend {
   gap: 8px;
 }
 
-.raza-tag .btn-remove {
+.race-tag .btn-remove {
   background: none;
   border: none;
   color: #0066cc;
@@ -84,11 +84,11 @@ legend {
   line-height: 1;
 }
 
-.raza-tag .btn-remove:hover {
+.race-tag .btn-remove:hover {
   color: #0052a3;
 }
 
-.razas-list {
+.races-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -99,7 +99,7 @@ legend {
   font-style: italic;
 }
 
-/* Items list (buffs, efectos) */
+/* Items list (buffs, effects) */
 .items-list {
   margin-bottom: 20px;
 }

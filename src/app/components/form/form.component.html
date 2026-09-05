@@ -1,120 +1,120 @@
 <div class="form-container">
-  <form (ngSubmit)="onGuardar()">
-    <!-- Información básica -->
+  <form (ngSubmit)="onSave()">
+    <!-- Basic information -->
     <fieldset>
-      <legend>Información Básica</legend>
+      <legend>Basic Information</legend>
 
       <div class="form-group">
-        <label for="titulo">Título *</label>
-        <input 
-          type="text" 
-          id="titulo" 
-          [(ngModel)]="carta.titulo" 
-          name="titulo"
-          (change)="onCartaChange()"
+        <label for="title">Title *</label>
+        <input
+          type="text"
+          id="title"
+          [(ngModel)]="card.title"
+          name="title"
+          (change)="onCardChange()"
           required
         />
       </div>
 
       <div class="form-group">
-        <label for="descripcion">Descripción</label>
-        <textarea 
-          id="descripcion" 
-          [(ngModel)]="carta.descripcion" 
-          name="descripcion"
-          (change)="onCartaChange()"
+        <label for="description">Description</label>
+        <textarea
+          id="description"
+          [(ngModel)]="card.description"
+          name="description"
+          (change)="onCardChange()"
           rows="4"
         ></textarea>
       </div>
 
       <div class="form-group">
-        <label for="imagen">URL de Imagen *</label>
-        <input 
-          type="url" 
-          id="imagen" 
-          [(ngModel)]="carta.imagen" 
-          name="imagen"
-          (change)="onCartaChange()"
+        <label for="image">Image URL *</label>
+        <input
+          type="url"
+          id="image"
+          [(ngModel)]="card.image"
+          name="image"
+          (change)="onCardChange()"
           required
         />
       </div>
     </fieldset>
 
-    <!-- Atributos -->
+    <!-- Attributes -->
     <fieldset>
-      <legend>Atributos</legend>
+      <legend>Attributes</legend>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="nivel">Nivel</label>
-          <select 
-            id="nivel" 
-            [(ngModel)]="carta.nivel" 
-            name="nivel"
-            (change)="onCartaChange()"
+          <label for="level">Level</label>
+          <select
+            id="level"
+            [(ngModel)]="card.level"
+            name="level"
+            (change)="onCardChange()"
           >
-            <option *ngFor="let nivel of config.nivelesDisponibles" [value]="nivel">
-              {{ nivel }}
+            <option *ngFor="let level of config.availableLevels" [value]="level">
+              {{ level }}
             </option>
           </select>
         </div>
 
         <div class="form-group">
-          <label for="vida">Vida</label>
-          <input 
-            type="number" 
-            id="vida" 
-            [(ngModel)]="carta.vida" 
-            name="vida"
-            (change)="onCartaChange()"
+          <label for="health">Health</label>
+          <input
+            type="number"
+            id="health"
+            [(ngModel)]="card.health"
+            name="health"
+            (change)="onCardChange()"
             min="0"
           />
         </div>
 
         <div class="form-group">
-          <label for="ataque">Ataque</label>
-          <input 
-            type="number" 
-            id="ataque" 
-            [(ngModel)]="carta.ataque" 
-            name="ataque"
-            (change)="onCartaChange()"
+          <label for="attack">Attack</label>
+          <input
+            type="number"
+            id="attack"
+            [(ngModel)]="card.attack"
+            name="attack"
+            (change)="onCardChange()"
             min="0"
           />
         </div>
       </div>
     </fieldset>
 
-    <!-- Razas -->
+    <!-- Races -->
     <fieldset>
-      <legend>Razas</legend>
+      <legend>Races</legend>
 
       <div class="form-group">
-        <label>Razas seleccionadas:</label>
-        <div class="razas-selected">
-          <span *ngFor="let raza of carta.razas" class="raza-tag">
-            {{ raza }}
-            <button 
+        <label>Selected races:</label>
+        <div class="races-selected">
+          <span *ngFor="let race of card.races" class="race-tag">
+            {{ race }}
+            <button
               type="button"
-              (click)="removerRaza(raza)"
+              (click)="removeRace(race)"
               class="btn-remove"
             >×</button>
           </span>
-          <span *ngIf="carta.razas.length === 0" class="empty">Ninguna raza seleccionada</span>
+          <span *ngIf="card.races.length === 0" class="empty">No race selected</span>
         </div>
       </div>
 
       <div class="form-group">
-        <label>Agregar raza:</label>
-        <div class="razas-list">
-          <button 
-            *ngFor="let raza of config.razasDisponibles"
+        <label>Add race:</label>
+        <div class="races-list">
+          <button
+            *ngFor="let race of config.availableRaces"
             type="button"
-            (click)="agregarRaza(raza)"
-            [disabled]="carta.razas.includes(raza)"
+            (click)="addRace(race)"
+            [disabled]="card.races.includes(race)"
             class="btn-secondary"
           >
-            + {{ raza }}
+            + {{ race }}
           </button>
         </div>
       </div>
@@ -122,160 +122,160 @@
 
     <!-- Buffs -->
     <fieldset>
-      <legend>Buffs Aplicados</legend>
+      <legend>Applied Buffs</legend>
 
-      <div *ngIf="carta.buffs_aplicados && carta.buffs_aplicados.length > 0" class="items-list">
-        <div *ngFor="let buff of carta.buffs_aplicados" class="item">
+      <div *ngIf="card.appliedBuffs && card.appliedBuffs.length > 0" class="items-list">
+        <div *ngFor="let buff of card.appliedBuffs" class="item">
           <div class="item-header">
-            <strong>{{ getNombreBuff(buff.buff) }}</strong>
-            <button 
+            <strong>{{ getBuffName(buff.buff) }}</strong>
+            <button
               type="button"
-              (click)="removerBuff(buff)"
+              (click)="removeBuff(buff)"
               class="btn-remove-item"
-            >Remover</button>
+            >Remove</button>
           </div>
           <div class="item-params">
-            <small *ngFor="let key of (buff.parametros | keyvalue)" class="param">
+            <small *ngFor="let key of (buff.parameters | keyvalue)" class="param">
               {{ key.key }}: {{ key.value }}
             </small>
           </div>
         </div>
       </div>
 
-      <div *ngIf="!carta.buffs_aplicados || carta.buffs_aplicados.length === 0" class="empty-message">
-        No hay buffs aplicados
+      <div *ngIf="!card.appliedBuffs || card.appliedBuffs.length === 0" class="empty-message">
+        No buffs applied
       </div>
 
-      <!-- Agregar buff (solo si la carta está guardada) -->
-      <div *ngIf="carta.id" class="add-item">
+      <!-- Add buff (only if the card is already saved) -->
+      <div *ngIf="card.id" class="add-item">
         <div class="form-row">
           <div class="form-group">
-            <label for="buffSelect">Seleccionar buff:</label>
-            <select 
+            <label for="buffSelect">Select buff:</label>
+            <select
               id="buffSelect"
-              [(ngModel)]="buffSeleccionado"
+              [(ngModel)]="selectedBuff"
               name="buffSelect"
-              (change)="onBuffSeleccionado()"
+              (change)="onBuffSelected()"
             >
-              <option [value]="null">-- Selecciona un buff --</option>
-              <option *ngFor="let buff of config.buffsDisponibles" [value]="buff.id">
+              <option [value]="null">-- Select a buff --</option>
+              <option *ngFor="let buff of config.availableBuffs" [value]="buff.id">
                 {{ buff.name }}
               </option>
             </select>
           </div>
         </div>
 
-        <!-- Parámetros del buff -->
-        <div *ngIf="buffSeleccionadoObj && buffSeleccionadoObj.atributos.length > 0" class="params-section">
-          <p class="section-title">Parámetros:</p>
+        <!-- Buff parameters -->
+        <div *ngIf="selectedBuffObj && selectedBuffObj.attributes.length > 0" class="params-section">
+          <p class="section-title">Parameters:</p>
           <div class="form-row">
-            <div 
-              *ngFor="let attr of buffSeleccionadoObj.atributos"
+            <div
+              *ngFor="let attr of selectedBuffObj.attributes"
               class="form-group"
             >
-              <label>{{ attr.nombre }} ({{ attr.tipo }})</label>
-              <input 
+              <label>{{ attr.name }} ({{ attr.type }})</label>
+              <input
                 type="text"
-                [(ngModel)]="parametrosTempBuff[attr.nombre]"
-                [name]="'buff_' + attr.nombre"
+                [(ngModel)]="tempBuffParameters[attr.name]"
+                [name]="'buff_' + attr.name"
               />
             </div>
           </div>
         </div>
 
-        <button 
+        <button
           type="button"
-          (click)="agregarBuff()"
-          [disabled]="!buffSeleccionado"
+          (click)="addBuff()"
+          [disabled]="!selectedBuff"
           class="btn-primary"
         >
-          Agregar Buff
+          Add Buff
         </button>
       </div>
     </fieldset>
 
-    <!-- Efectos -->
+    <!-- Effects -->
     <fieldset>
-      <legend>Efectos Contenidos</legend>
+      <legend>Contained Effects</legend>
 
-      <div *ngIf="carta.efectos && carta.efectos.length > 0" class="items-list">
-        <div *ngFor="let efecto of carta.efectos" class="item">
+      <div *ngIf="card.effects && card.effects.length > 0" class="items-list">
+        <div *ngFor="let effect of card.effects" class="item">
           <div class="item-header">
-            <strong>{{ getNombreEfecto(efecto.efecto) }}</strong>
-            <button 
+            <strong>{{ getEffectName(effect.effect) }}</strong>
+            <button
               type="button"
-              (click)="removerEfecto(efecto)"
+              (click)="removeEffect(effect)"
               class="btn-remove-item"
-            >Remover</button>
+            >Remove</button>
           </div>
           <div class="item-params">
-            <small *ngFor="let key of (efecto.parametros | keyvalue)" class="param">
+            <small *ngFor="let key of (effect.parameters | keyvalue)" class="param">
               {{ key.key }}: {{ key.value }}
             </small>
           </div>
         </div>
       </div>
 
-      <div *ngIf="!carta.efectos || carta.efectos.length === 0" class="empty-message">
-        No hay efectos contenidos
+      <div *ngIf="!card.effects || card.effects.length === 0" class="empty-message">
+        No effects contained
       </div>
 
-      <!-- Agregar efecto (solo si la carta está guardada) -->
-      <div *ngIf="carta.id" class="add-item">
+      <!-- Add effect (only if the card is already saved) -->
+      <div *ngIf="card.id" class="add-item">
         <div class="form-row">
           <div class="form-group">
-            <label for="efectoSelect">Seleccionar efecto:</label>
-            <select 
-              id="efectoSelect"
-              [(ngModel)]="efectoSeleccionado"
-              name="efectoSelect"
-              (change)="onEfectoSeleccionado()"
+            <label for="effectSelect">Select effect:</label>
+            <select
+              id="effectSelect"
+              [(ngModel)]="selectedEffect"
+              name="effectSelect"
+              (change)="onEffectSelected()"
             >
-              <option [value]="null">-- Selecciona un efecto --</option>
-              <option *ngFor="let efecto of config.efectosDisponibles" [value]="efecto.id">
-                {{ efecto.name }}
+              <option [value]="null">-- Select an effect --</option>
+              <option *ngFor="let effect of config.availableEffects" [value]="effect.id">
+                {{ effect.name }}
               </option>
             </select>
           </div>
         </div>
 
-        <!-- Parámetros del efecto -->
-        <div *ngIf="efectoSeleccionadoObj && efectoSeleccionadoObj.atributos.length > 0" class="params-section">
-          <p class="section-title">Parámetros:</p>
+        <!-- Effect parameters -->
+        <div *ngIf="selectedEffectObj && selectedEffectObj.attributes.length > 0" class="params-section">
+          <p class="section-title">Parameters:</p>
           <div class="form-row">
-            <div 
-              *ngFor="let attr of efectoSeleccionadoObj.atributos"
+            <div
+              *ngFor="let attr of selectedEffectObj.attributes"
               class="form-group"
             >
-              <label>{{ attr.nombre }} ({{ attr.tipo }})</label>
-              <input 
+              <label>{{ attr.name }} ({{ attr.type }})</label>
+              <input
                 type="text"
-                [(ngModel)]="parametrosTempEfecto[attr.nombre]"
-                [name]="'efecto_' + attr.nombre"
+                [(ngModel)]="tempEffectParameters[attr.name]"
+                [name]="'effect_' + attr.name"
               />
             </div>
           </div>
         </div>
 
-        <button 
+        <button
           type="button"
-          (click)="agregarEfecto()"
-          [disabled]="!efectoSeleccionado"
+          (click)="addEffect()"
+          [disabled]="!selectedEffect"
           class="btn-primary"
         >
-          Agregar Efecto
+          Add Effect
         </button>
       </div>
     </fieldset>
 
-    <!-- Botón guardar -->
+    <!-- Save button -->
     <div class="form-actions">
-      <button 
+      <button
         type="submit"
         class="btn-save"
-        [disabled]="guardando"
+        [disabled]="saving"
       >
-        {{ guardando ? 'Guardando...' : 'Guardar Carta' }}
+        {{ saving ? 'Saving...' : 'Save Card' }}
       </button>
     </div>
   </form>

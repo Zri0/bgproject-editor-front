@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Carta } from '../../models/models';
+import { Card } from '../../models/models';
 
 @Component({
   selector: 'app-preview',
@@ -10,5 +10,5 @@ import { Carta } from '../../models/models';
   styleUrls: ['./preview.component.css']
 })
 export class PreviewComponent {
-  @Input() carta!: Carta;
+  @Input() card!: Card;
 }

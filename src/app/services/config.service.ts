@@ -3,7 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { EditorConfig, Buff, Efecto } from '../models/models';
+import { EditorConfig, Buff, Effect } from '../models/models';
+import { mapBuffFromApi, mapEffectFromApi } from './api-mappers';
 
 @Injectable({
   providedIn: 'root'
@@ -15,20 +16,20 @@ export class ConfigService {
   constructor(private http: HttpClient) {}
 
   /**
-   * Obtener la configuración completa del editor
-   * Combina datos de buffs, efectos y configuración del servidor
+   * Get the full editor configuration
+   * Combines buffs, effects and server configuration
    */
-  obtenerConfig(): Observable<EditorConfig> {
+  getConfig(): Observable<EditorConfig> {
     if (!this.configCache$) {
       this.configCache$ = combineLatest([
-        this.obtenerBuffs(),
-        this.obtenerEfectos()
+        this.getBuffs(),
+        this.getEffects()
       ]).pipe(
-        map(([buffs, efectos]) => ({
-          nivelesDisponibles: this.obtenerNivelesDisponibles(),
-          razasDisponibles: this.obtenerRazasDisponibles(),
-          buffsDisponibles: buffs,
-          efectosDisponibles: efectos
+        map(([buffs, effects]) => ({
+          availableLevels: this.getAvailableLevels(),
+          availableRaces: this.getAvailableRaces(),
+          availableBuffs: buffs,
+          availableEffects: effects
         })),
         shareReplay(1)
       );
@@ -37,65 +38,67 @@ export class ConfigService {
   }
 
   /**
-   * Obtener lista de buffs disponibles
+   * Get the list of available buffs
    */
-  obtenerBuffs(): Observable<Buff[]> {
+  getBuffs(): Observable<Buff[]> {
     return this.http.get<any>(`${this.apiUrl}/buffs/`).pipe(
       map(response => {
-        // Manejar si la respuesta es paginada
-        return response.results ? response.results : response;
+        // Handle paginated responses
+        const results = response.results ? response.results : response;
+        return results.map(mapBuffFromApi);
       })
     );
   }
 
   /**
-   * Obtener un buff específico
+   * Get a specific buff
    */
-  obtenerBuff(id: number): Observable<Buff> {
-    return this.http.get<Buff>(`${this.apiUrl}/buffs/${id}/`);
+  getBuff(id: number): Observable<Buff> {
+    return this.http.get<any>(`${this.apiUrl}/buffs/${id}/`).pipe(map(mapBuffFromApi));
   }
 
   /**
-   * Obtener lista de efectos disponibles
+   * Get the list of available effects
    */
-  obtenerEfectos(): Observable<Efecto[]> {
+  getEffects(): Observable<Effect[]> {
     return this.http.get<any>(`${this.apiUrl}/efectos/`).pipe(
       map(response => {
-        // Manejar si la respuesta es paginada
-        return response.results ? response.results : response;
+        // Handle paginated responses
+        const results = response.results ? response.results : response;
+        return results.map(mapEffectFromApi);
       })
     );
   }
 
   /**
-   * Obtener un efecto específico
+   * Get a specific effect
    */
-  obtenerEfecto(id: number): Observable<Efecto> {
-    return this.http.get<Efecto>(`${this.apiUrl}/efectos/${id}/`);
+  getEffect(id: number): Observable<Effect> {
+    return this.http.get<any>(`${this.apiUrl}/efectos/${id}/`).pipe(map(mapEffectFromApi));
   }
 
   /**
-   * Obtener niveles disponibles
-   * Por ahora hardcodeado, puede venir del servidor en el futuro
+   * Get available levels
+   * Hardcoded for now, may come from the server in the future
    */
-  obtenerNivelesDisponibles(): number[] {
-    // TODO: Cargar desde configuración del servidor
+  getAvailableLevels(): number[] {
+    // TODO: Load from server configuration
     return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   }
 
   /**
-   * Obtener razas disponibles
-   * Por ahora hardcodeado, puede venir del servidor en el futuro
+   * Get available races
+   * Hardcoded for now, may come from the server in the future
    */
-  obtenerRazasDisponibles(): string[] {
-    // TODO: Cargar desde configuración del servidor
+  getAvailableRaces(): string[] {
+    // TODO: Load from server configuration
     return ['Human', 'Elf', 'Dwarf', 'Orc', 'Goblin', 'Dragon'];
   }
 
   /**
-   * Limpiar el cache de configuración
+   * Clear the configuration cache
    */
-  limpiarCache(): void {
+  clearCache(): void {
     this.configCache$ = null;
   }
 }

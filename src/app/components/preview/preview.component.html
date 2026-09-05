@@ -1,63 +1,63 @@
 <div class="preview-container">
-  <h2>Vista Previa</h2>
-  
+  <h2>Preview</h2>
+
   <div class="card">
-    <!-- Header con imagen -->
-    <div class="card-header" *ngIf="carta.imagen">
-      <img [src]="carta.imagen" alt="Card image" />
+    <!-- Header with image -->
+    <div class="card-header" *ngIf="card.image">
+      <img [src]="card.image" alt="Card image" />
     </div>
 
-    <!-- Título -->
+    <!-- Title -->
     <div class="card-title">
-      <h3>{{ carta.titulo || '(Título)' }}</h3>
+      <h3>{{ card.title || '(Title)' }}</h3>
     </div>
 
-    <!-- Razas -->
-    <div class="card-races" *ngIf="carta.razas && carta.razas.length > 0">
-      <span *ngFor="let raza of carta.razas" class="race-badge">{{ raza }}</span>
+    <!-- Races -->
+    <div class="card-races" *ngIf="card.races && card.races.length > 0">
+      <span *ngFor="let race of card.races" class="race-badge">{{ race }}</span>
     </div>
 
-    <!-- Atributos principales -->
+    <!-- Main attributes -->
     <div class="card-stats">
       <div class="stat">
-        <span class="stat-label">Nivel</span>
-        <span class="stat-value">{{ carta.nivel }}</span>
+        <span class="stat-label">Level</span>
+        <span class="stat-value">{{ card.level }}</span>
       </div>
       <div class="stat">
-        <span class="stat-label">Vida</span>
-        <span class="stat-value">{{ carta.vida }}</span>
+        <span class="stat-label">Health</span>
+        <span class="stat-value">{{ card.health }}</span>
       </div>
       <div class="stat">
-        <span class="stat-label">Ataque</span>
-        <span class="stat-value">{{ carta.ataque }}</span>
+        <span class="stat-label">Attack</span>
+        <span class="stat-value">{{ card.attack }}</span>
       </div>
     </div>
 
-    <!-- Descripción -->
-    <div class="card-description" *ngIf="carta.descripcion">
-      <p>{{ carta.descripcion }}</p>
+    <!-- Description -->
+    <div class="card-description" *ngIf="card.description">
+      <p>{{ card.description }}</p>
     </div>
 
     <!-- Buffs -->
-    <div class="card-buffs" *ngIf="carta.buffs_aplicados && carta.buffs_aplicados.length > 0">
+    <div class="card-buffs" *ngIf="card.appliedBuffs && card.appliedBuffs.length > 0">
       <div class="effects-title">Buffs</div>
       <div class="effects-list">
-        <div *ngFor="let buff of carta.buffs_aplicados" class="effect-item buff">
-          <strong>{{ buff.buff_detail?.name || 'Buff #' + buff.buff }}</strong>
-          <small *ngIf="buff.parametros | keyvalue as params">
+        <div *ngFor="let buff of card.appliedBuffs" class="effect-item buff">
+          <strong>{{ buff.buffDetail?.name || 'Buff #' + buff.buff }}</strong>
+          <small *ngIf="buff.parameters | keyvalue as params">
             <span *ngFor="let p of params" class="param">{{ p.key }}: {{ p.value }}</span>
           </small>
         </div>
       </div>
     </div>
 
-    <!-- Efectos -->
-    <div class="card-efectos" *ngIf="carta.efectos && carta.efectos.length > 0">
-      <div class="effects-title">Efectos</div>
+    <!-- Effects -->
+    <div class="card-effects" *ngIf="card.effects && card.effects.length > 0">
+      <div class="effects-title">Effects</div>
       <div class="effects-list">
-        <div *ngFor="let efecto of carta.efectos" class="effect-item efecto">
-          <strong>{{ efecto.efecto_detail?.name || 'Efecto #' + efecto.efecto }}</strong>
-          <small *ngIf="efecto.parametros | keyvalue as params">
+        <div *ngFor="let effect of card.effects" class="effect-item effect">
+          <strong>{{ effect.effectDetail?.name || 'Effect #' + effect.effect }}</strong>
+          <small *ngIf="effect.parameters | keyvalue as params">
             <span *ngFor="let p of params" class="param">{{ p.key }}: {{ p.value }}</span>
           </small>
         </div>
@@ -66,8 +66,8 @@
 
     <!-- Footer -->
     <div class="card-footer">
-      <small *ngIf="carta.created_at">Creada: {{ carta.created_at | date: 'short' }}</small>
-      <small *ngIf="carta.updated_at">Actualizada: {{ carta.updated_at | date: 'short' }}</small>
+      <small *ngIf="card.createdAt">Created: {{ card.createdAt | date: 'short' }}</small>
+      <small *ngIf="card.updatedAt">Updated: {{ card.updatedAt | date: 'short' }}</small>
     </div>
   </div>
 </div>

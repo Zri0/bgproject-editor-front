@@ -113,7 +113,7 @@
 }
 
 .card-buffs,
-.card-efectos {
+.card-effects {
   padding: 12px;
   border-bottom: 1px solid #ddd;
   background: white;
@@ -147,7 +147,7 @@
   border-left-color: #ff9800;
 }
 
-.effect-item.efecto {
+.effect-item.effect {
   background: #f0f8ff;
   border-left-color: #2196f3;
 }

@@ -1,8 +1,8 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Carta, EditorConfig, CartaBuffAplicado, CartaEfectoContenido, Parametros, Buff, Efecto } from '../../models/models';
-import { CartaService } from '../../services/carta.service';
+import { Card, EditorConfig, CardAppliedBuff, CardContainedEffect, Parameters, Buff, Effect } from '../../models/models';
+import { CardService } from '../../services/card.service';
 
 @Component({
   selector: 'app-form',
@@ -12,204 +12,204 @@ import { CartaService } from '../../services/carta.service';
   styleUrls: ['./form.component.css']
 })
 export class FormComponent implements OnInit {
-  @Input() carta!: Carta;
+  @Input() card!: Card;
   @Input() config!: EditorConfig;
-  @Input() guardando = false;
-  @Output() cartaChanged = new EventEmitter<Carta>();
-  @Output() guardar = new EventEmitter<Carta>();
+  @Input() saving = false;
+  @Output() cardChanged = new EventEmitter<Card>();
+  @Output() save = new EventEmitter<Card>();
 
-  buffSeleccionado: number | null = null;
-  efectoSeleccionado: number | null = null;
-  parametrosTempBuff: Parametros = {};
-  parametrosTempEfecto: Parametros = {};
+  selectedBuff: number | null = null;
+  selectedEffect: number | null = null;
+  tempBuffParameters: Parameters = {};
+  tempEffectParameters: Parameters = {};
 
-  constructor(private cartaService: CartaService) {}
+  constructor(private cardService: CardService) {}
 
   ngOnInit(): void {
-    if (!this.carta.buffs_aplicados) {
-      this.carta.buffs_aplicados = [];
+    if (!this.card.appliedBuffs) {
+      this.card.appliedBuffs = [];
     }
-    if (!this.carta.efectos) {
-      this.carta.efectos = [];
-    }
-  }
-
-  /**
-   * Emitir cambios en la carta cuando cambian los campos principales
-   */
-  onCartaChange(): void {
-    this.cartaChanged.emit(this.carta);
-  }
-
-  /**
-   * Emitir evento guardar
-   */
-  onGuardar(): void {
-    this.guardar.emit(this.carta);
-  }
-
-  /**
-   * Agregar una raza a la lista de razas de la carta
-   */
-  agregarRaza(raza: string): void {
-    if (raza && !this.carta.razas.includes(raza)) {
-      this.carta.razas.push(raza);
-      this.onCartaChange();
+    if (!this.card.effects) {
+      this.card.effects = [];
     }
   }
 
   /**
-   * Remover una raza de la lista
+   * Emit changes to the card when the main fields change
    */
-  removerRaza(raza: string): void {
-    const index = this.carta.razas.indexOf(raza);
+  onCardChange(): void {
+    this.cardChanged.emit(this.card);
+  }
+
+  /**
+   * Emit the save event
+   */
+  onSave(): void {
+    this.save.emit(this.card);
+  }
+
+  /**
+   * Add a race to the card's race list
+   */
+  addRace(race: string): void {
+    if (race && !this.card.races.includes(race)) {
+      this.card.races.push(race);
+      this.onCardChange();
+    }
+  }
+
+  /**
+   * Remove a race from the list
+   */
+  removeRace(race: string): void {
+    const index = this.card.races.indexOf(race);
     if (index >= 0) {
-      this.carta.razas.splice(index, 1);
-      this.onCartaChange();
+      this.card.races.splice(index, 1);
+      this.onCardChange();
     }
   }
 
   /**
-   * Obtener el Buff seleccionado
+   * Get the selected Buff
    */
-  get buffSeleccionadoObj(): Buff | undefined {
-    return this.config.buffsDisponibles.find(b => b.id === this.buffSeleccionado);
+  get selectedBuffObj(): Buff | undefined {
+    return this.config.availableBuffs.find(b => b.id === this.selectedBuff);
   }
 
   /**
-   * Obtener el Efecto seleccionado
+   * Get the selected Effect
    */
-  get efectoSeleccionadoObj(): Efecto | undefined {
-    return this.config.efectosDisponibles.find(e => e.id === this.efectoSeleccionado);
+  get selectedEffectObj(): Effect | undefined {
+    return this.config.availableEffects.find(e => e.id === this.selectedEffect);
   }
 
   /**
-   * Inicializar parámetros temporales cuando se selecciona un buff
+   * Initialize temporary parameters when a buff is selected
    */
-  onBuffSeleccionado(): void {
-    if (this.buffSeleccionado && this.buffSeleccionadoObj) {
-      this.parametrosTempBuff = {};
-      this.buffSeleccionadoObj.atributos.forEach(attr => {
-        this.parametrosTempBuff[attr.nombre] = '';
+  onBuffSelected(): void {
+    if (this.selectedBuff && this.selectedBuffObj) {
+      this.tempBuffParameters = {};
+      this.selectedBuffObj.attributes.forEach(attr => {
+        this.tempBuffParameters[attr.name] = '';
       });
     }
   }
 
   /**
-   * Inicializar parámetros temporales cuando se selecciona un efecto
+   * Initialize temporary parameters when an effect is selected
    */
-  onEfectoSeleccionado(): void {
-    if (this.efectoSeleccionado && this.efectoSeleccionadoObj) {
-      this.parametrosTempEfecto = {};
-      this.efectoSeleccionadoObj.atributos.forEach(attr => {
-        this.parametrosTempEfecto[attr.nombre] = '';
+  onEffectSelected(): void {
+    if (this.selectedEffect && this.selectedEffectObj) {
+      this.tempEffectParameters = {};
+      this.selectedEffectObj.attributes.forEach(attr => {
+        this.tempEffectParameters[attr.name] = '';
       });
     }
   }
 
   /**
-   * Agregar un buff a la carta
+   * Add a buff to the card
    */
-  agregarBuff(): void {
-    if (!this.buffSeleccionado || !this.carta.id) {
-      alert('Por favor guarda la carta primero');
+  addBuff(): void {
+    if (!this.selectedBuff || !this.card.id) {
+      alert('Please save the card first');
       return;
     }
 
-    this.cartaService.agregarBuff(this.carta.id, this.buffSeleccionado, this.parametrosTempBuff)
+    this.cardService.addBuff(this.card.id, this.selectedBuff, this.tempBuffParameters)
       .subscribe({
-        next: (buffAplicado) => {
-          if (!this.carta.buffs_aplicados) {
-            this.carta.buffs_aplicados = [];
+        next: (appliedBuff) => {
+          if (!this.card.appliedBuffs) {
+            this.card.appliedBuffs = [];
           }
-          this.carta.buffs_aplicados.push(buffAplicado);
-          this.buffSeleccionado = null;
-          this.parametrosTempBuff = {};
-          this.onCartaChange();
+          this.card.appliedBuffs.push(appliedBuff);
+          this.selectedBuff = null;
+          this.tempBuffParameters = {};
+          this.onCardChange();
         },
-        error: (err) => alert('Error al agregar buff: ' + err.message)
+        error: (err) => alert('Error adding buff: ' + err.message)
       });
   }
 
   /**
-   * Remover un buff de la carta
+   * Remove a buff from the card
    */
-  removerBuff(buffAplicado: CartaBuffAplicado): void {
-    if (!this.carta.id) return;
+  removeBuff(appliedBuff: CardAppliedBuff): void {
+    if (!this.card.id) return;
 
-    this.cartaService.removerBuff(this.carta.id, buffAplicado.buff)
+    this.cardService.removeBuff(this.card.id, appliedBuff.buff)
       .subscribe({
         next: () => {
-          if (this.carta.buffs_aplicados) {
-            const index = this.carta.buffs_aplicados.indexOf(buffAplicado);
+          if (this.card.appliedBuffs) {
+            const index = this.card.appliedBuffs.indexOf(appliedBuff);
             if (index >= 0) {
-              this.carta.buffs_aplicados.splice(index, 1);
+              this.card.appliedBuffs.splice(index, 1);
             }
           }
-          this.onCartaChange();
+          this.onCardChange();
         },
-        error: (err) => alert('Error al remover buff: ' + err.message)
+        error: (err) => alert('Error removing buff: ' + err.message)
       });
   }
 
   /**
-   * Agregar un efecto a la carta
+   * Add an effect to the card
    */
-  agregarEfecto(): void {
-    if (!this.efectoSeleccionado || !this.carta.id) {
-      alert('Por favor guarda la carta primero');
+  addEffect(): void {
+    if (!this.selectedEffect || !this.card.id) {
+      alert('Please save the card first');
       return;
     }
 
-    this.cartaService.agregarEfecto(this.carta.id, this.efectoSeleccionado, this.parametrosTempEfecto)
+    this.cardService.addEffect(this.card.id, this.selectedEffect, this.tempEffectParameters)
       .subscribe({
-        next: (efectoContenido) => {
-          if (!this.carta.efectos) {
-            this.carta.efectos = [];
+        next: (containedEffect) => {
+          if (!this.card.effects) {
+            this.card.effects = [];
           }
-          this.carta.efectos.push(efectoContenido);
-          this.efectoSeleccionado = null;
-          this.parametrosTempEfecto = {};
-          this.onCartaChange();
+          this.card.effects.push(containedEffect);
+          this.selectedEffect = null;
+          this.tempEffectParameters = {};
+          this.onCardChange();
         },
-        error: (err) => alert('Error al agregar efecto: ' + err.message)
+        error: (err) => alert('Error adding effect: ' + err.message)
       });
   }
 
   /**
-   * Remover un efecto de la carta
+   * Remove an effect from the card
    */
-  removerEfecto(efectoContenido: CartaEfectoContenido): void {
-    if (!this.carta.id) return;
+  removeEffect(containedEffect: CardContainedEffect): void {
+    if (!this.card.id) return;
 
-    this.cartaService.removerEfecto(this.carta.id, efectoContenido.efecto)
+    this.cardService.removeEffect(this.card.id, containedEffect.effect)
       .subscribe({
         next: () => {
-          if (this.carta.efectos) {
-            const index = this.carta.efectos.indexOf(efectoContenido);
+          if (this.card.effects) {
+            const index = this.card.effects.indexOf(containedEffect);
             if (index >= 0) {
-              this.carta.efectos.splice(index, 1);
+              this.card.effects.splice(index, 1);
             }
           }
-          this.onCartaChange();
+          this.onCardChange();
         },
-        error: (err) => alert('Error al remover efecto: ' + err.message)
+        error: (err) => alert('Error removing effect: ' + err.message)
       });
   }
 
   /**
-   * Obtener el nombre de un buff por ID
+   * Get the name of a buff by ID
    */
-  getNombreBuff(buffId: number): string {
-    const buff = this.config.buffsDisponibles.find(b => b.id === buffId);
-    return buff?.name || 'Desconocido';
+  getBuffName(buffId: number): string {
+    const buff = this.config.availableBuffs.find(b => b.id === buffId);
+    return buff?.name || 'Unknown';
   }
 
   /**
-   * Obtener el nombre de un efecto por ID
+   * Get the name of an effect by ID
    */
-  getNombreEfecto(efectoId: number): string {
-    const efecto = this.config.efectosDisponibles.find(e => e.id === efectoId);
-    return efecto?.name || 'Desconocido';
+  getEffectName(effectId: number): string {
+    const effect = this.config.availableEffects.find(e => e.id === effectId);
+    return effect?.name || 'Unknown';
   }
 }

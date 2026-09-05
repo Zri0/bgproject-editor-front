@@ -1,6 +1,6 @@
 # Card Editor - Frontend (Angular)
 
-Aplicación web para crear y editar cartas de juego con buffs y efectos dinámicos.
+Web application for creating and editing game cards with dynamic buffs and effects.
 
 ## Stack
 
@@ -10,31 +10,31 @@ Aplicación web para crear y editar cartas de juego con buffs y efectos dinámic
 - **HTTP Client**: Angular HttpClient
 - **State Management**: RxJS Observables
 
-## Requisitos
+## Requirements
 
 - Node.js 18+
 - npm 9+
 
-## Instalación
+## Installation
 
-### 1. Clonar el repositorio
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/yourusername/card-editor-frontend.git
 cd card-editor-frontend
 ```
 
-### 2. Instalar dependencias
+### 2. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Configurar variables de entorno
+### 3. Configure environment variables
 
-Las URLs de la API se configuran en `/src/environments/`:
+The API URLs are configured in `/src/environments/`:
 
-**Para desarrollo** (`environment.ts`):
+**For development** (`environment.ts`):
 ```typescript
 export const environment = {
   production: false,
@@ -42,54 +42,55 @@ export const environment = {
 };
 ```
 
-**Para producción** (`environment.prod.ts`):
+**For production** (`environment.prod.ts`):
 ```typescript
 export const environment = {
   production: true,
-  apiUrl: 'https://api.cartas.example.com/api'
+  apiUrl: 'https://api.cards.example.com/api'
 };
 ```
 
-### 4. Iniciar servidor de desarrollo
+### 4. Start the development server
 
 ```bash
 npm start
-# o
+# or
 ng serve --open
 ```
 
-La aplicación estará disponible en `http://localhost:4200`
+The application will be available at `http://localhost:4200`
 
-## Uso
+## Usage
 
-La aplicación es un editor de cartas simple con dos modos:
+The application is a simple card editor with two modes:
 
-### Crear una nueva carta
-- Accede a `http://localhost:4200` (sin parámetros en la URL)
-- Completa el formulario
-- Haz clic en "Guardar Carta"
-- Una vez guardada, podrás agregar Buffs y Efectos
+### Create a new card
+- Go to `http://localhost:4200` (no parameters in the URL)
+- Fill in the form
+- Click "Save Card"
+- Once saved, you can add Buffs and Effects
 
-### Editar una carta existente
-- Accede a `http://localhost:4200?id={cartaId}`
-- Modifica los campos según sea necesario
-- Agrega o remueve Buffs y Efectos
-- Haz clic en "Guardar Carta" para guardar los cambios
+### Edit an existing card
+- Go to `http://localhost:4200?id={cardId}`
+- Modify the fields as needed
+- Add or remove Buffs and Effects
+- Click "Save Card" to save the changes
 
-## Estructura del Proyecto
+## Project Structure
 
 ```
 src/
 ├── app/
 │   ├── components/
-│   │   ├── editor/          # Componente principal
-│   │   ├── form/            # Formulario de edición
-│   │   └── preview/         # Vista previa de la carta
+│   │   ├── editor/          # Main component
+│   │   ├── form/            # Editing form
+│   │   └── preview/         # Card preview
 │   ├── services/
-│   │   ├── carta.service.ts       # Gestión de cartas
-│   │   └── config.service.ts      # Configuración del editor
+│   │   ├── card.service.ts        # Card management
+│   │   ├── config.service.ts      # Editor configuration
+│   │   └── api-mappers.ts         # Backend <-> domain model mapping
 │   ├── models/
-│   │   └── models.ts        # Interfaces de TypeScript
+│   │   └── models.ts        # TypeScript interfaces
 │   └── app.component.ts
 ├── environments/
 │   ├── environment.ts       # Dev
@@ -99,85 +100,91 @@ src/
 └── styles.css
 ```
 
-## Componentes
+## Components
 
 ### EditorComponent
-Componente principal que orquesta todo:
-- Determina el modo (create/edit) desde la URL
-- Carga la configuración
-- Maneja el ciclo de vida de la carta
+Main component that orchestrates everything:
+- Determines the mode (create/edit) from the URL
+- Loads the configuration
+- Manages the card's lifecycle
 - Props:
   - `mode`: 'create' | 'edit'
-  - `carta`: Datos de la carta
-  - `config`: Configuración cargada
+  - `card`: Card data
+  - `config`: Loaded configuration
 
 ### FormComponent
-Formulario para editar los datos de la carta:
-- Campos: título, descripción, imagen, nivel, razas, ataque, vida
-- Gestión de Buffs y Efectos
-- Eventos:
-  - `@Output cartaChanged`: Cuando cambia un campo
-  - `@Output guardar`: Cuando se guarda la carta
+Form for editing the card's data:
+- Fields: title, description, image, level, races, attack, health
+- Manages Buffs and Effects
+- Events:
+  - `@Output cardChanged`: When a field changes
+  - `@Output save`: When the card is saved
 
 ### PreviewComponent
-Vista previa HTML/CSS de la carta:
-- Renderiza visualmente la carta
-- Se sincroniza en tiempo real con el formulario
-- Muestra buffs y efectos aplicados
+HTML/CSS preview of the card:
+- Renders the card visually
+- Syncs in real time with the form
+- Shows applied buffs and effects
 
-## Servicios
+## Services
 
-### CartaService
-Maneja la comunicación HTTP con el backend:
-- `listarCartas()` - GET /cartas/
-- `obtenerCarta(id)` - GET /cartas/{id}/
-- `crearCarta(carta)` - POST /cartas/
-- `actualizarCarta(id, carta)` - PUT /cartas/{id}/
-- `eliminarCarta(id)` - DELETE /cartas/{id}/
-- `agregarBuff(cartaId, buffId, parametros)` - POST /cartas/{id}/add-buff/
-- `removerBuff(cartaId, buffId)` - DELETE /cartas/{id}/remove-buff/{buffId}/
-- `agregarEfecto(cartaId, efectoId, parametros)` - POST /cartas/{id}/add-efecto/
-- `removerEfecto(cartaId, efectoId)` - DELETE /cartas/{id}/remove-efecto/{efectoId}/
+### CardService
+Handles HTTP communication with the backend:
+- `listCards()` - GET /cartas/
+- `getCard(id)` - GET /cartas/{id}/
+- `createCard(card)` - POST /cartas/
+- `updateCard(id, card)` - PUT /cartas/{id}/
+- `deleteCard(id)` - DELETE /cartas/{id}/
+- `addBuff(cardId, buffId, parameters)` - POST /cartas/{id}/add-buff/
+- `removeBuff(cardId, buffId)` - DELETE /cartas/{id}/remove-buff/{buffId}/
+- `addEffect(cardId, effectId, parameters)` - POST /cartas/{id}/add-efecto/
+- `removeEffect(cardId, effectId)` - DELETE /cartas/{id}/remove-efecto/{effectId}/
+
+> The backend API is not part of this repository and speaks Spanish field
+> names (`titulo`, `descripcion`, `parametros`, etc.) and Spanish endpoint
+> segments (`add-efecto`, `remove-efecto`). `api-mappers.ts` translates
+> between that wire format and the English domain models used everywhere
+> else in the app, so the backend can stay untouched.
 
 ### ConfigService
-Carga la configuración del editor:
-- `obtenerConfig()` - Combinación de buffs, efectos y configuración
-- `obtenerBuffs()` - GET /buffs/
-- `obtenerEfectos()` - GET /efectos/
-- `obtenerNivelesDisponibles()` - Lista de niveles
-- `obtenerRazasDisponibles()` - Lista de razas
+Loads the editor configuration:
+- `getConfig()` - Combination of buffs, effects and configuration
+- `getBuffs()` - GET /buffs/
+- `getEffects()` - GET /efectos/
+- `getAvailableLevels()` - List of levels
+- `getAvailableRaces()` - List of races
 
-## Modelos de Datos
+## Data Models
 
-Consulta `/src/app/models/models.ts` para las interfaces TypeScript:
+See `/src/app/models/models.ts` for the TypeScript interfaces:
 
-- `Buff`: Mejora aplicable a una carta
-- `Efecto`: Efecto contenido en una carta
-- `Carta`: Entidad principal
-- `CartaBuffAplicado`: Relación de buff con parámetros
-- `CartaEfectoContenido`: Relación de efecto con parámetros
-- `EditorConfig`: Configuración del editor
+- `Buff`: improvement applicable to a card
+- `Effect`: effect contained in a card
+- `Card`: main entity
+- `CardAppliedBuff`: buff relationship with parameters
+- `CardContainedEffect`: effect relationship with parameters
+- `EditorConfig`: editor configuration
 
-## Conexión con Backend
+## Backend Connection
 
-La aplicación se conecta automáticamente al backend en la URL configurada en `environment.ts`.
+The application automatically connects to the backend at the URL configured in `environment.ts`.
 
-**Asegúrate de:**
+**Make sure that:**
 
-1. Que el backend está ejecutándose en la URL correcta (por defecto `http://localhost:8000/api`)
-2. Que CORS está habilitado en el backend con la URL del frontend (por defecto `http://localhost:4200`)
-3. Que las configuraciones en `.env` del backend incluyan:
+1. The backend is running at the correct URL (default `http://localhost:8000/api`)
+2. CORS is enabled on the backend for the frontend's URL (default `http://localhost:4200`)
+3. The backend's `.env` configuration includes:
    ```env
    CORS_ALLOWED_ORIGINS=http://localhost:4200,http://127.0.0.1:4200
    ```
 
-## Build para Producción
+## Production Build
 
 ```bash
 npm run build:prod
 ```
 
-Los archivos compilados estarán en `/dist/card-editor-frontend`
+The compiled files will be in `/dist/card-editor-frontend`
 
 ## Testing
 
@@ -185,41 +192,42 @@ Los archivos compilados estarán en `/dist/card-editor-frontend`
 npm run test
 ```
 
-## Desarrollo
+## Development
 
-### Cambiar la URL del API
-Edita `src/environments/environment.ts` y `src/environments/environment.prod.ts`
+### Changing the API URL
+Edit `src/environments/environment.ts` and `src/environments/environment.prod.ts`
 
-### Agregar nuevos campos a la carta
-1. Actualiza el modelo en `src/app/models/models.ts`
-2. Agrega el campo en el formulario (`form.component.html`)
-3. Actualiza el backend correspondiente
+### Adding new fields to the card
+1. Update the model in `src/app/models/models.ts`
+2. Update the API mapping in `src/app/services/api-mappers.ts`
+3. Add the field to the form (`form.component.html`)
+4. Update the corresponding backend
 
-### Personalizar el diseño del preview
-Edita `src/app/components/preview/preview.component.css`
+### Customizing the preview design
+Edit `src/app/components/preview/preview.component.css`
 
 ## Troubleshooting
 
 ### CORS errors
-- Verifica que `CORS_ALLOWED_ORIGINS` en el backend incluya `http://localhost:4200`
-- Reinicia el servidor Django
+- Check that `CORS_ALLOWED_ORIGINS` on the backend includes `http://localhost:4200`
+- Restart the Django server
 
-### API no responde
-- Verifica que el backend está ejecutándose en `http://localhost:8000`
-- Comprueba la URL en `environment.ts`
-- Verifica los logs del navegador (F12 > Console)
+### API not responding
+- Check that the backend is running at `http://localhost:8000`
+- Check the URL in `environment.ts`
+- Check the browser logs (F12 > Console)
 
-### Carta no se guarda
-- Comprueba que el título e imagen son obligatorios
-- Revisa los errores en la consola del navegador
-- Verifica que el backend tiene datos en la BD
+### Card doesn't save
+- Check that title and image are provided (both required)
+- Check the errors in the browser console
+- Check that the backend has data in its database
 
 ## Performance
 
-- Los servicios usan RxJS `shareReplay()` para cachear configuración
-- El formulario usa `OnPush` change detection (recomendado)
-- Las imágenes se cargan desde URLs externas (optimiza tus servidores de imágenes)
+- Services use RxJS `shareReplay()` to cache configuration
+- The form uses `OnPush` change detection (recommended)
+- Images are loaded from external URLs (optimize your image servers)
 
-## Licencia
+## License
 
 MIT

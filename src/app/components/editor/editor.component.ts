@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { CartaService } from '../../services/carta.service';
+import { CardService } from '../../services/card.service';
 import { ConfigService } from '../../services/config.service';
-import { Carta, EditorConfig, EditorMode } from '../../models/models';
+import { Card, EditorConfig, EditorMode } from '../../models/models';
 import { FormComponent } from '../form/form.component';
 import { PreviewComponent } from '../preview/preview.component';
 
@@ -18,152 +18,152 @@ import { PreviewComponent } from '../preview/preview.component';
 })
 export class EditorComponent implements OnInit, OnDestroy {
   mode: EditorMode = 'create';
-  cartaId: number | null = null;
-  carta: Carta | null = null;
+  cardId: number | null = null;
+  card: Card | null = null;
   config: EditorConfig | null = null;
   loading = true;
   error: string | null = null;
-  guardando = false;
+  saving = false;
 
   private destroy$ = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
-    private cartaService: CartaService,
+    private cardService: CardService,
     private configService: ConfigService
   ) {}
 
   ngOnInit(): void {
-    // Determinar el modo (create o edit) desde la ruta
+    // Determine the mode (create or edit) from the route
     this.route.queryParams
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
         if (params['id']) {
           this.mode = 'edit';
-          this.cartaId = parseInt(params['id'], 10);
+          this.cardId = parseInt(params['id'], 10);
         } else {
           this.mode = 'create';
-          this.cartaId = null;
+          this.cardId = null;
         }
-        this.inicializar();
+        this.initialize();
       });
   }
 
   /**
-   * Inicializar el editor cargando configuración y carta (si es edición)
+   * Initialize the editor by loading configuration and card (if editing)
    */
-  private inicializar(): void {
+  private initialize(): void {
     this.loading = true;
     this.error = null;
 
-    // Cargar configuración
-    this.configService.obtenerConfig()
+    // Load configuration
+    this.configService.getConfig()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (config) => {
           this.config = config;
-          
-          // Si es edición, cargar la carta
-          if (this.mode === 'edit' && this.cartaId) {
-            this.cargarCarta();
+
+          // If editing, load the card
+          if (this.mode === 'edit' && this.cardId) {
+            this.loadCard();
           } else {
-            // Si es creación, inicializar con carta vacía
-            this.carta = this.crearCartaVacia();
+            // If creating, initialize with an empty card
+            this.card = this.createEmptyCard();
             this.loading = false;
           }
         },
         error: (err) => {
-          this.error = 'Error al cargar la configuración: ' + err.message;
+          this.error = 'Error loading configuration: ' + err.message;
           this.loading = false;
         }
       });
   }
 
   /**
-   * Cargar carta existente
+   * Load an existing card
    */
-  private cargarCarta(): void {
-    if (!this.cartaId) return;
+  private loadCard(): void {
+    if (!this.cardId) return;
 
-    this.cartaService.obtenerCarta(this.cartaId)
+    this.cardService.getCard(this.cardId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (carta) => {
-          this.carta = carta;
+        next: (card) => {
+          this.card = card;
           this.loading = false;
         },
         error: (err) => {
-          this.error = 'Error al cargar la carta: ' + err.message;
+          this.error = 'Error loading card: ' + err.message;
           this.loading = false;
         }
       });
   }
 
   /**
-   * Crear una carta vacía para el modo creación
+   * Create an empty card for creation mode
    */
-  private crearCartaVacia(): Carta {
+  private createEmptyCard(): Card {
     return {
-      titulo: '',
-      descripcion: '',
-      imagen: '',
-      nivel: this.config?.nivelesDisponibles[0] || 1,
-      razas: [],
-      ataque: 0,
-      vida: 0,
-      buffs_aplicados: [],
-      efectos: []
+      title: '',
+      description: '',
+      image: '',
+      level: this.config?.availableLevels[0] || 1,
+      races: [],
+      attack: 0,
+      health: 0,
+      appliedBuffs: [],
+      effects: []
     };
   }
 
   /**
-   * Manejar cambios en el formulario
+   * Handle changes made in the form
    */
-  onCartaChanged(carta: Carta): void {
-    this.carta = carta;
-    this.cartaService.setCartaActual(carta);
+  onCardChanged(card: Card): void {
+    this.card = card;
+    this.cardService.setCurrentCard(card);
   }
 
   /**
-   * Guardar la carta
+   * Save the card
    */
-  onGuardar(carta: Carta): void {
-    if (!carta.titulo || !carta.imagen) {
-      this.error = 'Por favor completa los campos requeridos (título e imagen)';
+  onSave(card: Card): void {
+    if (!card.title || !card.image) {
+      this.error = 'Please complete the required fields (title and image)';
       return;
     }
 
-    this.guardando = true;
+    this.saving = true;
     this.error = null;
 
     if (this.mode === 'create') {
-      this.cartaService.crearCarta(carta)
+      this.cardService.createCard(card)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: (cartaGuardada) => {
-            this.carta = cartaGuardada;
+          next: (savedCard) => {
+            this.card = savedCard;
             this.mode = 'edit';
-            this.cartaId = cartaGuardada.id || null;
-            this.guardando = false;
-            alert('¡Carta creada exitosamente!');
+            this.cardId = savedCard.id || null;
+            this.saving = false;
+            alert('Card created successfully!');
           },
           error: (err) => {
-            this.error = 'Error al crear la carta: ' + err.message;
-            this.guardando = false;
+            this.error = 'Error creating card: ' + err.message;
+            this.saving = false;
           }
         });
-    } else if (this.mode === 'edit' && this.cartaId) {
-      this.cartaService.actualizarCarta(this.cartaId, carta)
+    } else if (this.mode === 'edit' && this.cardId) {
+      this.cardService.updateCard(this.cardId, card)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: (cartaActualizada) => {
-            this.carta = cartaActualizada;
-            this.guardando = false;
-            alert('¡Carta actualizada exitosamente!');
+          next: (updatedCard) => {
+            this.card = updatedCard;
+            this.saving = false;
+            alert('Card updated successfully!');
           },
           error: (err) => {
-            this.error = 'Error al actualizar la carta: ' + err.message;
-            this.guardando = false;
+            this.error = 'Error updating card: ' + err.message;
+            this.saving = false;
           }
         });
     }

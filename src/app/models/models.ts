@@ -1,98 +1,98 @@
 /**
- * Modelos de datos para la aplicación de edición de cartas
+ * Data models for the card editing application
  */
 
 /**
- * Atributo: Estructura nombre-tipo que define qué parámetros puede tener
+ * Attribute: name-type structure that defines what parameters an entity can have
  */
-export interface Atributo {
-  nombre: string;
-  tipo: 'entero' | 'string' | 'booleano' | 'decimal';
+export interface Attribute {
+  name: string;
+  type: 'integer' | 'string' | 'boolean' | 'decimal';
 }
 
 /**
- * Buff: Mejora que se puede aplicar a una carta
+ * Buff: improvement that can be applied to a card
  */
 export interface Buff {
   id: number;
   name: string;
   description: string;
-  atributos: Atributo[];
-  created_at?: string;
-  updated_at?: string;
+  attributes: Attribute[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 /**
- * Efecto: Condición/efecto que puede estar contenido en una carta
+ * Effect: condition/effect that can be contained in a card
  */
-export interface Efecto {
+export interface Effect {
   id: number;
   name: string;
   description: string;
-  atributos: Atributo[];
-  created_at?: string;
-  updated_at?: string;
+  attributes: Attribute[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 /**
- * Parámetros: Valores específicos para una instancia de Buff/Efecto
- * Ej: {"hp": 10, "attack": 5}
+ * Parameters: specific values for a Buff/Effect instance
+ * Ex: {"hp": 10, "attack": 5}
  */
-export type Parametros = Record<string, any>;
+export type Parameters = Record<string, any>;
 
 /**
- * CartaBuffAplicado: Relación de Buff aplicado a una Carta
+ * CardAppliedBuff: relationship of a Buff applied to a Card
  */
-export interface CartaBuffAplicado {
+export interface CardAppliedBuff {
   id: number;
   buff: number;
-  buff_detail?: Buff;
-  parametros: Parametros;
-  created_at?: string;
-  updated_at?: string;
+  buffDetail?: Buff;
+  parameters: Parameters;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 /**
- * CartaEfectoContenido: Relación de Efecto contenido en una Carta
+ * CardContainedEffect: relationship of an Effect contained in a Card
  */
-export interface CartaEfectoContenido {
+export interface CardContainedEffect {
   id: number;
-  efecto: number;
-  efecto_detail?: Efecto;
-  parametros: Parametros;
-  created_at?: string;
-  updated_at?: string;
+  effect: number;
+  effectDetail?: Effect;
+  parameters: Parameters;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 /**
- * Carta: Entidad principal - la carta de juego a editar
+ * Card: main entity - the game card being edited
  */
-export interface Carta {
+export interface Card {
   id?: number;
-  titulo: string;
-  descripcion: string;
-  imagen: string; // URL
-  nivel: number;
-  razas: string[]; // Array de razas
-  ataque: number;
-  vida: number;
-  buffs_aplicados?: CartaBuffAplicado[];
-  efectos?: CartaEfectoContenido[];
-  created_at?: string;
-  updated_at?: string;
+  title: string;
+  description: string;
+  image: string; // URL
+  level: number;
+  races: string[]; // Array of races
+  attack: number;
+  health: number;
+  appliedBuffs?: CardAppliedBuff[];
+  effects?: CardContainedEffect[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 /**
- * Configuración cargada del backend
+ * Configuration loaded from the backend
  */
 export interface EditorConfig {
-  nivelesDisponibles: number[];
-  razasDisponibles: string[];
-  buffsDisponibles: Buff[];
-  efectosDisponibles: Efecto[];
+  availableLevels: number[];
+  availableRaces: string[];
+  availableBuffs: Buff[];
+  availableEffects: Effect[];
 }
 
 /**
- * Modo del editor
+ * Editor mode
  */
 export type EditorMode = 'create' | 'edit';
