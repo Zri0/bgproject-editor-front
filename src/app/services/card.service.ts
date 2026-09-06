@@ -16,7 +16,7 @@ import {
   providedIn: 'root'
 })
 export class CardService {
-  private apiUrl = `${environment.apiUrl}/cartas`;
+  private apiUrl = `${environment.apiUrl}/cards`;
   private currentCard$ = new BehaviorSubject<Card | null>(null);
 
   constructor(private http: HttpClient) {}
@@ -69,7 +69,7 @@ export class CardService {
   addBuff(cardId: number, buffId: number, parameters: Parameters): Observable<CardAppliedBuff> {
     return this.http.post<any>(
       `${this.apiUrl}/${cardId}/add-buff/`,
-      { buff: buffId, parametros: mapParametersForApi(parameters) }
+      { buff: buffId, parameters: mapParametersForApi(parameters) }
     ).pipe(map(mapAppliedBuffFromApi));
   }
 
@@ -85,8 +85,8 @@ export class CardService {
    */
   addEffect(cardId: number, effectId: number, parameters: Parameters): Observable<CardContainedEffect> {
     return this.http.post<any>(
-      `${this.apiUrl}/${cardId}/add-efecto/`,
-      { efecto: effectId, parametros: mapParametersForApi(parameters) }
+      `${this.apiUrl}/${cardId}/add-effect/`,
+      { effect: effectId, parameters: mapParametersForApi(parameters) }
     ).pipe(map(mapContainedEffectFromApi));
   }
 
@@ -94,7 +94,7 @@ export class CardService {
    * Remove an effect from a card
    */
   removeEffect(cardId: number, effectId: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${cardId}/remove-efecto/${effectId}/`);
+    return this.http.delete(`${this.apiUrl}/${cardId}/remove-effect/${effectId}/`);
   }
 
   /**

@@ -61,7 +61,7 @@ export class ConfigService {
    * Get the list of available effects
    */
   getEffects(): Observable<Effect[]> {
-    return this.http.get<any>(`${this.apiUrl}/efectos/`).pipe(
+    return this.http.get<any>(`${this.apiUrl}/effects/`).pipe(
       map(response => {
         // Handle paginated responses
         const results = response.results ? response.results : response;
@@ -74,7 +74,7 @@ export class ConfigService {
    * Get a specific effect
    */
   getEffect(id: number): Observable<Effect> {
-    return this.http.get<any>(`${this.apiUrl}/efectos/${id}/`).pipe(map(mapEffectFromApi));
+    return this.http.get<any>(`${this.apiUrl}/effects/${id}/`).pipe(map(mapEffectFromApi));
   }
 
   /**
