@@ -28,6 +28,15 @@ h1 {
   margin-bottom: 20px;
 }
 
+.warning-message {
+  background-color: #fff8e1;
+  border: 1px solid #ffe082;
+  color: #8a6d00;
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
 .editor-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;

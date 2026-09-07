@@ -114,7 +114,11 @@ Main component that orchestrates everything:
 
 ### FormComponent
 Form for editing the card's data:
-- Fields: title, description, image, level, races, attack, health
+- Fields: title, description, image (file upload), level, races, attack, health
+- The image is chosen with a file input and uploaded to the API as
+  `multipart/form-data`; on edit, leaving the file input empty keeps the
+  current image
+- Races are picked from the backend's race list and stored as race ids
 - Manages Buffs and Effects
 - Events:
   - `@Output cardChanged`: When a field changes
@@ -130,29 +134,28 @@ HTML/CSS preview of the card:
 
 ### CardService
 Handles HTTP communication with the backend:
-- `listCards()` - GET /cartas/
-- `getCard(id)` - GET /cartas/{id}/
-- `createCard(card)` - POST /cartas/
-- `updateCard(id, card)` - PUT /cartas/{id}/
-- `deleteCard(id)` - DELETE /cartas/{id}/
-- `addBuff(cardId, buffId, parameters)` - POST /cartas/{id}/add-buff/
-- `removeBuff(cardId, buffId)` - DELETE /cartas/{id}/remove-buff/{buffId}/
-- `addEffect(cardId, effectId, parameters)` - POST /cartas/{id}/add-efecto/
-- `removeEffect(cardId, effectId)` - DELETE /cartas/{id}/remove-efecto/{effectId}/
+- `listCards()` - GET /cards/
+- `getCard(id)` - GET /cards/{id}/
+- `createCard(card)` - POST /cards/ (`multipart/form-data`)
+- `updateCard(id, card)` - PUT /cards/{id}/ (`multipart/form-data`)
+- `deleteCard(id)` - DELETE /cards/{id}/
+- `addBuff(cardId, buffId, parameters)` - POST /cards/{id}/add-buff/
+- `removeBuff(cardId, buffId)` - DELETE /cards/{id}/remove-buff/{buffId}/
+- `addEffect(cardId, effectId, parameters)` - POST /cards/{id}/add-effect/
+- `removeEffect(cardId, effectId)` - DELETE /cards/{id}/remove-effect/{effectId}/
 
-> The backend API is not part of this repository and speaks Spanish field
-> names (`titulo`, `descripcion`, `parametros`, etc.) and Spanish endpoint
-> segments (`add-efecto`, `remove-efecto`). `api-mappers.ts` translates
-> between that wire format and the English domain models used everywhere
-> else in the app, so the backend can stay untouched.
+> The backend API is not part of this repository. `api-mappers.ts` translates
+> between the wire payloads (`snake_case`, expanded relationships) and the
+> domain models used everywhere else in the app. Card writes are sent as
+> `multipart/form-data` because `image` is an uploaded file, not a URL.
 
 ### ConfigService
 Loads the editor configuration:
-- `getConfig()` - Combination of buffs, effects and configuration
+- `getConfig()` - Combination of buffs, effects, races and configuration
 - `getBuffs()` - GET /buffs/
-- `getEffects()` - GET /efectos/
+- `getEffects()` - GET /effects/
+- `getRaces()` - GET /races/
 - `getAvailableLevels()` - List of levels
-- `getAvailableRaces()` - List of races
 
 ## Data Models
 
@@ -160,7 +163,8 @@ See `/src/app/models/models.ts` for the TypeScript interfaces:
 
 - `Buff`: improvement applicable to a card
 - `Effect`: effect contained in a card
-- `Card`: main entity
+- `Race`: creature type assignable to a card (referenced by id)
+- `Card`: main entity (`image` is the stored URL from the API; `imageFile` holds a pending upload)
 - `CardAppliedBuff`: buff relationship with parameters
 - `CardContainedEffect`: effect relationship with parameters
 - `EditorConfig`: editor configuration
@@ -218,15 +222,17 @@ Edit `src/app/components/preview/preview.component.css`
 - Check the browser logs (F12 > Console)
 
 ### Card doesn't save
-- Check that title and image are provided (both required)
+- Check that the title is provided, and that an image file is chosen when creating a card
 - Check the errors in the browser console
+- Check that the backend serves `/media/` (needs `DEBUG=True` or a configured web server)
 - Check that the backend has data in its database
 
 ## Performance
 
 - Services use RxJS `shareReplay()` to cache configuration
 - The form uses `OnPush` change detection (recommended)
-- Images are loaded from external URLs (optimize your image servers)
+- Images are uploaded to and served by the backend; the preview shows a local
+  `URL.createObjectURL()` blob until the card is saved
 
 ## License
 

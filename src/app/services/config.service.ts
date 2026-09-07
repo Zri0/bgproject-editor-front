@@ -3,8 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { EditorConfig, Buff, Effect } from '../models/models';
-import { mapBuffFromApi, mapEffectFromApi } from './api-mappers';
+import { EditorConfig, Buff, Effect, Race } from '../models/models';
+import { mapBuffFromApi, mapEffectFromApi, mapRaceFromApi } from './api-mappers';
 
 @Injectable({
   providedIn: 'root'
@@ -23,11 +23,12 @@ export class ConfigService {
     if (!this.configCache$) {
       this.configCache$ = combineLatest([
         this.getBuffs(),
-        this.getEffects()
+        this.getEffects(),
+        this.getRaces()
       ]).pipe(
-        map(([buffs, effects]) => ({
+        map(([buffs, effects, races]) => ({
           availableLevels: this.getAvailableLevels(),
-          availableRaces: this.getAvailableRaces(),
+          availableRaces: races,
           availableBuffs: buffs,
           availableEffects: effects
         })),
@@ -78,21 +79,25 @@ export class ConfigService {
   }
 
   /**
+   * Get the list of available races
+   */
+  getRaces(): Observable<Race[]> {
+    return this.http.get<any>(`${this.apiUrl}/races/`).pipe(
+      map(response => {
+        // Handle paginated responses
+        const results = response.results ? response.results : response;
+        return results.map(mapRaceFromApi);
+      })
+    );
+  }
+
+  /**
    * Get available levels
    * Hardcoded for now, may come from the server in the future
    */
   getAvailableLevels(): number[] {
     // TODO: Load from server configuration
     return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  }
-
-  /**
-   * Get available races
-   * Hardcoded for now, may come from the server in the future
-   */
-  getAvailableRaces(): string[] {
-    // TODO: Load from server configuration
-    return ['Human', 'Elf', 'Dwarf', 'Orc', 'Goblin', 'Dragon'];
   }
 
   /**

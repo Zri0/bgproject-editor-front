@@ -9,6 +9,10 @@
     <strong>Error:</strong> {{ error }}
   </div>
 
+  <div *ngIf="warning" class="warning-message">
+    <strong>Heads up:</strong> {{ warning }}
+  </div>
+
   <div *ngIf="!loading && config && card" class="editor-layout">
     <div class="editor-left">
       <app-form
@@ -21,7 +25,7 @@
     </div>
 
     <div class="editor-right">
-      <app-preview [card]="card"></app-preview>
+      <app-preview [card]="card" [config]="config"></app-preview>
     </div>
   </div>
 </div>

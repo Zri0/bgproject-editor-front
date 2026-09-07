@@ -3,8 +3,8 @@
 
   <div class="card">
     <!-- Header with image -->
-    <div class="card-header" *ngIf="card.image">
-      <img [src]="card.image" alt="Card image" />
+    <div class="card-header" *ngIf="imageSrc">
+      <img [src]="imageSrc" alt="Card image" />
     </div>
 
     <!-- Title -->
@@ -14,7 +14,7 @@
 
     <!-- Races -->
     <div class="card-races" *ngIf="card.races && card.races.length > 0">
-      <span *ngFor="let race of card.races" class="race-badge">{{ race }}</span>
+      <span *ngFor="let raceId of card.races" class="race-badge">{{ raceName(raceId) }}</span>
     </div>
 
     <!-- Main attributes -->

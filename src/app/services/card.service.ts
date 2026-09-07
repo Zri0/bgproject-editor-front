@@ -7,7 +7,7 @@ import { Card, CardAppliedBuff, CardContainedEffect, Parameters } from '../model
 import {
   mapAppliedBuffFromApi,
   mapCardFromApi,
-  mapCardToApi,
+  mapCardToFormData,
   mapContainedEffectFromApi,
   mapParametersForApi
 } from './api-mappers';
@@ -43,17 +43,19 @@ export class CardService {
   }
 
   /**
-   * Create a new card
+   * Create a new card.
+   * Sent as multipart/form-data so the uploaded image travels with the fields.
    */
   createCard(card: Card): Observable<Card> {
-    return this.http.post<any>(this.apiUrl + '/', mapCardToApi(card)).pipe(map(mapCardFromApi));
+    return this.http.post<any>(this.apiUrl + '/', mapCardToFormData(card)).pipe(map(mapCardFromApi));
   }
 
   /**
-   * Update an existing card
+   * Update an existing card.
+   * Multipart/form-data; the image is only re-sent when the user picked a new file.
    */
   updateCard(id: number, card: Partial<Card>): Observable<Card> {
-    return this.http.put<any>(`${this.apiUrl}/${id}/`, mapCardToApi(card)).pipe(map(mapCardFromApi));
+    return this.http.put<any>(`${this.apiUrl}/${id}/`, mapCardToFormData(card)).pipe(map(mapCardFromApi));
   }
 
   /**

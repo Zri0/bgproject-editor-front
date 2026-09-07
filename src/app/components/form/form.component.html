@@ -28,15 +28,25 @@
       </div>
 
       <div class="form-group">
-        <label for="image">Image URL *</label>
+        <label for="image">Image {{ card.id ? '' : '*' }}</label>
         <input
-          type="url"
+          #imageInput
+          type="file"
           id="image"
-          [(ngModel)]="card.image"
           name="image"
-          (change)="onCardChange()"
-          required
+          accept="image/*"
+          (change)="onImageSelected($event)"
         />
+        <p *ngIf="card.imageFile" class="image-status">
+          New file: <strong>{{ card.imageFile.name }}</strong>
+          <button type="button" class="btn-remove" (click)="clearImageSelection(imageInput)">×</button>
+        </p>
+        <p *ngIf="!card.imageFile && card.image" class="image-status">
+          Current: <a [href]="card.image" target="_blank" rel="noopener">view image</a>
+        </p>
+        <p *ngIf="!card.imageFile && !card.image" class="image-status empty">
+          No image uploaded
+        </p>
       </div>
     </fieldset>
 
@@ -92,11 +102,11 @@
       <div class="form-group">
         <label>Selected races:</label>
         <div class="races-selected">
-          <span *ngFor="let race of card.races" class="race-tag">
-            {{ race }}
+          <span *ngFor="let raceId of card.races" class="race-tag">
+            {{ raceName(raceId) }}
             <button
               type="button"
-              (click)="removeRace(race)"
+              (click)="removeRace(raceId)"
               class="btn-remove"
             >×</button>
           </span>
@@ -111,10 +121,10 @@
             *ngFor="let race of config.availableRaces"
             type="button"
             (click)="addRace(race)"
-            [disabled]="card.races.includes(race)"
+            [disabled]="isRaceSelected(race)"
             class="btn-secondary"
           >
-            + {{ race }}
+            + {{ race.name }}
           </button>
         </div>
       </div>

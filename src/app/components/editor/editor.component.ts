@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Observable, Subject, of } from 'rxjs';
+import { switchMap, takeUntil } from 'rxjs/operators';
 import { CardService } from '../../services/card.service';
 import { ConfigService } from '../../services/config.service';
 import { Card, EditorConfig, EditorMode } from '../../models/models';
@@ -23,6 +23,7 @@ export class EditorComponent implements OnInit, OnDestroy {
   config: EditorConfig | null = null;
   loading = true;
   error: string | null = null;
+  warning: string | null = null;
   saving = false;
 
   private destroy$ = new Subject<void>();
@@ -55,6 +56,7 @@ export class EditorComponent implements OnInit, OnDestroy {
   private initialize(): void {
     this.loading = true;
     this.error = null;
+    this.warning = null;
 
     // Load configuration
     this.configService.getConfig()
@@ -106,7 +108,8 @@ export class EditorComponent implements OnInit, OnDestroy {
     return {
       title: '',
       description: '',
-      image: '',
+      image: null,
+      imageFile: null,
       level: this.config?.availableLevels[0] || 1,
       races: [],
       attack: 0,
@@ -128,45 +131,76 @@ export class EditorComponent implements OnInit, OnDestroy {
    * Save the card
    */
   onSave(card: Card): void {
-    if (!card.title || !card.image) {
-      this.error = 'Please complete the required fields (title and image)';
+    if (!card.title) {
+      this.error = 'Please complete the required field: title';
+      return;
+    }
+
+    if (this.mode === 'create' && !card.imageFile) {
+      this.error = 'Please choose an image file to upload';
       return;
     }
 
     this.saving = true;
     this.error = null;
+    this.warning = null;
 
-    if (this.mode === 'create') {
-      this.cardService.createCard(card)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (savedCard) => {
-            this.card = savedCard;
-            this.mode = 'edit';
-            this.cardId = savedCard.id || null;
-            this.saving = false;
-            alert('Card created successfully!');
-          },
-          error: (err) => {
-            this.error = 'Error creating card: ' + err.message;
-            this.saving = false;
+    const wasCreate = this.mode === 'create';
+    const write$: Observable<Card> = wasCreate
+      ? this.cardService.createCard(card)
+      : this.cardService.updateCard(this.cardId!, card);
+
+    write$
+      .pipe(
+        // The write endpoints answer with a trimmed body; re-read the full
+        // representation so the editor always reflects what was actually stored.
+        switchMap(saved => {
+          const id = saved.id ?? this.cardId;
+          return id ? this.cardService.getCard(id) : of(saved);
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: (serverCard) => {
+          this.card = this.reconcile(card, serverCard);
+          this.mode = 'edit';
+          this.cardId = this.card.id ?? null;
+          this.saving = false;
+          if (!this.warning) {
+            alert(wasCreate ? 'Card created successfully!' : 'Card updated successfully!');
           }
-        });
-    } else if (this.mode === 'edit' && this.cardId) {
-      this.cardService.updateCard(this.cardId, card)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (updatedCard) => {
-            this.card = updatedCard;
-            this.saving = false;
-            alert('Card updated successfully!');
-          },
-          error: (err) => {
-            this.error = 'Error updating card: ' + err.message;
-            this.saving = false;
-          }
-        });
-    }
+        },
+        error: (err) => {
+          this.error = `Error ${wasCreate ? 'creating' : 'updating'} card: ` + err.message;
+          this.saving = false;
+        }
+      });
+  }
+
+  /**
+   * Reconcile the submitted card with the server's stored representation.
+   *
+   * `id`, the stored image URL, expanded relationships and timestamps are taken
+   * from the server. If the server dropped fields the user filled in (the write
+   * serializer currently ignores `races`), those local values are kept so the
+   * work is not lost and a warning is raised.
+   */
+  private reconcile(submitted: Card, server: Card): Card {
+    const droppedRaces = submitted.races.length > 0 && server.races.length === 0;
+
+    const dropped: string[] = [];
+    if (droppedRaces) dropped.push('races');
+    this.warning = dropped.length
+      ? `Saved, but the backend did not persist: ${dropped.join(', ')}. `
+        + 'These values are shown from your input and will be lost on reload.'
+      : null;
+
+    return {
+      ...server,
+      imageFile: null,
+      races: droppedRaces ? submitted.races : server.races,
+      racesDetail: droppedRaces ? submitted.racesDetail : server.racesDetail
+    };
   }
 
   ngOnDestroy(): void {

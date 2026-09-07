@@ -35,6 +35,18 @@ export interface Effect {
 }
 
 /**
+ * Race: creature type that can be assigned to a card.
+ * Managed on the backend; the editor references races by id.
+ */
+export interface Race {
+  id: number;
+  name: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
  * Parameters: specific values for a Buff/Effect instance
  * Ex: {"hp": 10, "attack": 5}
  */
@@ -71,9 +83,13 @@ export interface Card {
   id?: number;
   title: string;
   description: string;
-  image: string; // URL
+  /** Absolute URL of the image served by the backend, or null when none is set. Read-only. */
+  image: string | null;
+  /** File picked in the form, pending upload. Sent to the API as multipart/form-data. */
+  imageFile?: File | null;
   level: number;
-  races: string[]; // Array of races
+  races: number[]; // Race ids
+  racesDetail?: Race[]; // Expanded races returned by the API (read-only)
   attack: number;
   health: number;
   appliedBuffs?: CardAppliedBuff[];
@@ -87,7 +103,7 @@ export interface Card {
  */
 export interface EditorConfig {
   availableLevels: number[];
-  availableRaces: string[];
+  availableRaces: Race[];
   availableBuffs: Buff[];
   availableEffects: Effect[];
 }

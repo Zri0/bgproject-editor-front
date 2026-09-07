@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Card, EditorConfig, CardAppliedBuff, CardContainedEffect, Parameters, Buff, Effect } from '../../models/models';
+import { Card, EditorConfig, CardAppliedBuff, CardContainedEffect, Parameters, Buff, Effect, Race } from '../../models/models';
 import { CardService } from '../../services/card.service';
 
 @Component({
@@ -49,11 +49,47 @@ export class FormComponent implements OnInit {
   }
 
   /**
+   * Store the file the user picked so it can be uploaded on save
+   */
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files && input.files.length ? input.files[0] : null;
+    if (file) {
+      this.card.imageFile = file;
+      this.onCardChange();
+    }
+  }
+
+  /**
+   * Clear a pending image selection (keeps the card's current stored image)
+   */
+  clearImageSelection(input: HTMLInputElement): void {
+    input.value = '';
+    this.card.imageFile = null;
+    this.onCardChange();
+  }
+
+  /**
+   * Whether the given race is already assigned to the card
+   */
+  isRaceSelected(race: Race): boolean {
+    return this.card.races.includes(race.id);
+  }
+
+  /**
+   * Resolve a race id to its display name
+   */
+  raceName(raceId: number): string {
+    const race = this.config.availableRaces.find(r => r.id === raceId);
+    return race?.name || `Race #${raceId}`;
+  }
+
+  /**
    * Add a race to the card's race list
    */
-  addRace(race: string): void {
-    if (race && !this.card.races.includes(race)) {
-      this.card.races.push(race);
+  addRace(race: Race): void {
+    if (!this.card.races.includes(race.id)) {
+      this.card.races.push(race.id);
       this.onCardChange();
     }
   }
@@ -61,8 +97,8 @@ export class FormComponent implements OnInit {
   /**
    * Remove a race from the list
    */
-  removeRace(race: string): void {
-    const index = this.card.races.indexOf(race);
+  removeRace(raceId: number): void {
+    const index = this.card.races.indexOf(raceId);
     if (index >= 0) {
       this.card.races.splice(index, 1);
       this.onCardChange();

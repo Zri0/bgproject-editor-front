@@ -1,20 +1,39 @@
 /**
- * Mapping layer between the backend API shape (Spanish field names) and the
- * app's internal English domain models (see models.ts). The backend contract
- * itself is out of scope here, so all translation happens at this boundary.
+ * Mapping layer between the backend API payloads and the app's internal domain
+ * models (see models.ts). The backend speaks English `snake_case`; this boundary
+ * translates casing and nesting, and turns card writes into `multipart/form-data`
+ * so the uploaded `image` file travels with the rest of the fields.
  */
-import { Attribute, Buff, Card, CardAppliedBuff, CardContainedEffect, Effect, Parameters } from '../models/models';
+import { environment } from '../../environments/environment';
+import { Attribute, Buff, Card, CardAppliedBuff, CardContainedEffect, Effect, Parameters, Race } from '../models/models';
+
+/**
+ * Normalize the image path returned by the API. Responses usually carry an
+ * absolute URL, but a relative `/media/...` path (or a bare filename) is
+ * resolved against the API origin so the `<img>` still loads.
+ */
+function resolveImageUrl(image: string | null | undefined): string | null {
+  if (!image) return null;
+  if (/^(https?:)?\/\//i.test(image) || image.startsWith('data:') || image.startsWith('blob:')) {
+    return image;
+  }
+  try {
+    return new URL(image, new URL(environment.apiUrl).origin).href;
+  } catch {
+    return image;
+  }
+}
 
 interface ApiAttribute {
-  nombre: string;
-  tipo: 'entero' | 'string' | 'booleano' | 'decimal';
+  name: string;
+  type: 'integer' | 'string' | 'boolean' | 'decimal';
 }
 
 interface ApiBuff {
   id: number;
   name: string;
   description: string;
-  atributos: ApiAttribute[];
+  attributes: ApiAttribute[];
   created_at?: string;
   updated_at?: string;
 }
@@ -23,7 +42,15 @@ interface ApiEffect {
   id: number;
   name: string;
   description: string;
-  atributos: ApiAttribute[];
+  attributes: ApiAttribute[];
+  created_at?: string;
+  updated_at?: string;
+}
+
+interface ApiRace {
+  id: number;
+  name: string;
+  description?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -34,55 +61,38 @@ interface ApiCardAppliedBuff {
   id: number;
   buff: number;
   buff_detail?: ApiBuff;
-  parametros: ApiParameters;
+  parameters: ApiParameters;
   created_at?: string;
   updated_at?: string;
 }
 
 interface ApiCardContainedEffect {
   id: number;
-  efecto: number;
-  efecto_detail?: ApiEffect;
-  parametros: ApiParameters;
+  effect: number;
+  effect_detail?: ApiEffect;
+  parameters: ApiParameters;
   created_at?: string;
   updated_at?: string;
 }
 
 interface ApiCard {
   id?: number;
-  titulo: string;
-  descripcion: string;
-  imagen: string;
-  nivel: number;
-  razas: string[];
-  ataque: number;
-  vida: number;
-  buffs_aplicados?: ApiCardAppliedBuff[];
-  efectos?: ApiCardContainedEffect[];
+  title: string;
+  description: string;
+  image: string | null;
+  level: number;
+  races: number[];
+  races_detail?: ApiRace[];
+  attack: number;
+  health: number;
+  applied_buffs?: ApiCardAppliedBuff[];
+  effects?: ApiCardContainedEffect[];
   created_at?: string;
   updated_at?: string;
 }
 
-const attributeTypeFromApi: Record<ApiAttribute['tipo'], Attribute['type']> = {
-  entero: 'integer',
-  string: 'string',
-  booleano: 'boolean',
-  decimal: 'decimal'
-};
-
-const attributeTypeToApi: Record<Attribute['type'], ApiAttribute['tipo']> = {
-  integer: 'entero',
-  string: 'string',
-  boolean: 'booleano',
-  decimal: 'decimal'
-};
-
 export function mapAttributeFromApi(api: ApiAttribute): Attribute {
-  return { name: api.nombre, type: attributeTypeFromApi[api.tipo] };
-}
-
-export function mapAttributeToApi(attribute: Attribute): ApiAttribute {
-  return { nombre: attribute.name, tipo: attributeTypeToApi[attribute.type] };
+  return { name: api.name, type: api.type };
 }
 
 export function mapBuffFromApi(api: ApiBuff): Buff {
@@ -90,7 +100,7 @@ export function mapBuffFromApi(api: ApiBuff): Buff {
     id: api.id,
     name: api.name,
     description: api.description,
-    attributes: (api.atributos || []).map(mapAttributeFromApi),
+    attributes: (api.attributes || []).map(mapAttributeFromApi),
     createdAt: api.created_at,
     updatedAt: api.updated_at
   };
@@ -101,7 +111,17 @@ export function mapEffectFromApi(api: ApiEffect): Effect {
     id: api.id,
     name: api.name,
     description: api.description,
-    attributes: (api.atributos || []).map(mapAttributeFromApi),
+    attributes: (api.attributes || []).map(mapAttributeFromApi),
+    createdAt: api.created_at,
+    updatedAt: api.updated_at
+  };
+}
+
+export function mapRaceFromApi(api: ApiRace): Race {
+  return {
+    id: api.id,
+    name: api.name,
+    description: api.description,
     createdAt: api.created_at,
     updatedAt: api.updated_at
   };
@@ -120,7 +140,7 @@ export function mapAppliedBuffFromApi(api: ApiCardAppliedBuff): CardAppliedBuff 
     id: api.id,
     buff: api.buff,
     buffDetail: api.buff_detail ? mapBuffFromApi(api.buff_detail) : undefined,
-    parameters: mapParametersFromApi(api.parametros),
+    parameters: mapParametersFromApi(api.parameters),
     createdAt: api.created_at,
     updatedAt: api.updated_at
   };
@@ -129,9 +149,9 @@ export function mapAppliedBuffFromApi(api: ApiCardAppliedBuff): CardAppliedBuff 
 export function mapContainedEffectFromApi(api: ApiCardContainedEffect): CardContainedEffect {
   return {
     id: api.id,
-    effect: api.efecto,
-    effectDetail: api.efecto_detail ? mapEffectFromApi(api.efecto_detail) : undefined,
-    parameters: mapParametersFromApi(api.parametros),
+    effect: api.effect,
+    effectDetail: api.effect_detail ? mapEffectFromApi(api.effect_detail) : undefined,
+    parameters: mapParametersFromApi(api.parameters),
     createdAt: api.created_at,
     updatedAt: api.updated_at
   };
@@ -140,31 +160,42 @@ export function mapContainedEffectFromApi(api: ApiCardContainedEffect): CardCont
 export function mapCardFromApi(api: ApiCard): Card {
   return {
     id: api.id,
-    title: api.titulo,
-    description: api.descripcion,
-    image: api.imagen,
-    level: api.nivel,
-    races: api.razas,
-    attack: api.ataque,
-    health: api.vida,
-    appliedBuffs: (api.buffs_aplicados || []).map(mapAppliedBuffFromApi),
-    effects: (api.efectos || []).map(mapContainedEffectFromApi),
+    title: api.title,
+    description: api.description ?? '',
+    image: resolveImageUrl(api.image),
+    level: api.level,
+    races: api.races ?? [],
+    racesDetail: (api.races_detail || []).map(mapRaceFromApi),
+    attack: api.attack,
+    health: api.health,
+    appliedBuffs: (api.applied_buffs || []).map(mapAppliedBuffFromApi),
+    effects: (api.effects || []).map(mapContainedEffectFromApi),
     createdAt: api.created_at,
     updatedAt: api.updated_at
   };
 }
 
-export function mapCardToApi(card: Partial<Card>): Partial<ApiCard> {
-  const api: Partial<ApiCard> = {};
-  if (card.id !== undefined) api.id = card.id;
-  if (card.title !== undefined) api.titulo = card.title;
-  if (card.description !== undefined) api.descripcion = card.description;
-  if (card.image !== undefined) api.imagen = card.image;
-  if (card.level !== undefined) api.nivel = card.level;
-  if (card.races !== undefined) api.razas = card.races;
-  if (card.attack !== undefined) api.ataque = card.attack;
-  if (card.health !== undefined) api.vida = card.health;
-  return api;
+/**
+ * Build the `multipart/form-data` body for creating/updating a card.
+ *
+ * `image` is appended only when the user picked a new file; omitting it keeps
+ * the current file on `PUT`/`PATCH` (see the backend README). `races` is sent as
+ * one repeated field per id, which is how the API reads the many-to-many.
+ */
+export function mapCardToFormData(card: Partial<Card>): FormData {
+  const form = new FormData();
+  if (card.title !== undefined) form.append('title', card.title);
+  if (card.description !== undefined) form.append('description', card.description ?? '');
+  if (card.level !== undefined) form.append('level', String(card.level));
+  if (card.attack !== undefined) form.append('attack', String(card.attack));
+  if (card.health !== undefined) form.append('health', String(card.health));
+  if (card.races !== undefined) {
+    card.races.forEach(raceId => form.append('races', String(raceId)));
+  }
+  if (card.imageFile) {
+    form.append('image', card.imageFile);
+  }
+  return form;
 }
 
 export function mapParametersForApi(parameters: Parameters): ApiParameters {
