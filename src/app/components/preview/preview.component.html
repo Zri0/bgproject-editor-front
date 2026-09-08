@@ -1,73 +1,76 @@
 <div class="preview-container">
   <h2>Preview</h2>
 
-  <div class="card">
-    <!-- Header with image -->
-    <div class="card-header" *ngIf="imageSrc">
-      <img [src]="imageSrc" alt="Card image" />
+  <!-- Battlegrounds-style card (matches bgproyect-web-client) -->
+  <div class="bg-card">
+    <!-- Masked art -->
+    <img
+      *ngIf="imageSrc"
+      class="bg-card__art"
+      [src]="imageSrc"
+      alt="Card art"
+      draggable="false"
+    />
+
+    <!-- Card frame overlay -->
+    <img
+      class="bg-card__frame"
+      src="/assets/card.png"
+      alt="Card frame"
+      draggable="false"
+    />
+
+    <!-- Tier / level badge -->
+    <div class="bg-card__tier">{{ card.level }}</div>
+
+    <!-- Name -->
+    <div class="bg-card__name">{{ card.title || '(Title)' }}</div>
+
+    <!-- Body text -->
+    <div class="bg-card__text">{{ card.description }}</div>
+
+    <!-- Attack -->
+    <div class="bg-card__attack">{{ card.attack }}</div>
+
+    <!-- Health -->
+    <div class="bg-card__health">{{ card.health }}</div>
+  </div>
+
+  <!-- Editor-only details not shown on the game card -->
+  <div class="card-extra">
+    <div class="card-extra__row" *ngIf="card.races && card.races.length > 0">
+      <span class="card-extra__label">Races</span>
+      <span class="card-extra__chips">
+        <span *ngFor="let raceId of card.races" class="race-badge">{{ raceName(raceId) }}</span>
+      </span>
     </div>
 
-    <!-- Title -->
-    <div class="card-title">
-      <h3>{{ card.title || '(Title)' }}</h3>
+    <div class="card-extra__row" *ngIf="card.appliedBuffs && card.appliedBuffs.length > 0">
+      <span class="card-extra__label">Buffs</span>
+      <span class="card-extra__chips">
+        <span *ngFor="let buff of card.appliedBuffs" class="effect-chip buff">
+          {{ buff.buffDetail?.name || 'Buff #' + buff.buff }}
+          <small *ngFor="let p of (buff.parameters | keyvalue)">{{ p.key }}: {{ p.value }}</small>
+        </span>
+      </span>
     </div>
 
-    <!-- Races -->
-    <div class="card-races" *ngIf="card.races && card.races.length > 0">
-      <span *ngFor="let raceId of card.races" class="race-badge">{{ raceName(raceId) }}</span>
+    <div class="card-extra__row" *ngIf="card.effects && card.effects.length > 0">
+      <span class="card-extra__label">Effects</span>
+      <span class="card-extra__chips">
+        <span *ngFor="let effect of card.effects" class="effect-chip effect">
+          {{ effect.effectDetail?.name || 'Effect #' + effect.effect }}
+          <small *ngFor="let p of (effect.parameters | keyvalue)">{{ p.key }}: {{ p.value }}</small>
+        </span>
+      </span>
     </div>
 
-    <!-- Main attributes -->
-    <div class="card-stats">
-      <div class="stat">
-        <span class="stat-label">Level</span>
-        <span class="stat-value">{{ card.level }}</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Health</span>
-        <span class="stat-value">{{ card.health }}</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Attack</span>
-        <span class="stat-value">{{ card.attack }}</span>
-      </div>
-    </div>
-
-    <!-- Description -->
-    <div class="card-description" *ngIf="card.description">
-      <p>{{ card.description }}</p>
-    </div>
-
-    <!-- Buffs -->
-    <div class="card-buffs" *ngIf="card.appliedBuffs && card.appliedBuffs.length > 0">
-      <div class="effects-title">Buffs</div>
-      <div class="effects-list">
-        <div *ngFor="let buff of card.appliedBuffs" class="effect-item buff">
-          <strong>{{ buff.buffDetail?.name || 'Buff #' + buff.buff }}</strong>
-          <small *ngIf="buff.parameters | keyvalue as params">
-            <span *ngFor="let p of params" class="param">{{ p.key }}: {{ p.value }}</span>
-          </small>
-        </div>
-      </div>
-    </div>
-
-    <!-- Effects -->
-    <div class="card-effects" *ngIf="card.effects && card.effects.length > 0">
-      <div class="effects-title">Effects</div>
-      <div class="effects-list">
-        <div *ngFor="let effect of card.effects" class="effect-item effect">
-          <strong>{{ effect.effectDetail?.name || 'Effect #' + effect.effect }}</strong>
-          <small *ngIf="effect.parameters | keyvalue as params">
-            <span *ngFor="let p of params" class="param">{{ p.key }}: {{ p.value }}</span>
-          </small>
-        </div>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="card-footer">
-      <small *ngIf="card.createdAt">Created: {{ card.createdAt | date: 'short' }}</small>
-      <small *ngIf="card.updatedAt">Updated: {{ card.updatedAt | date: 'short' }}</small>
+    <div class="card-extra__row" *ngIf="card.createdAt || card.updatedAt">
+      <span class="card-extra__label">Dates</span>
+      <span class="card-extra__meta">
+        <small *ngIf="card.createdAt">Created: {{ card.createdAt | date: 'short' }}</small>
+        <small *ngIf="card.updatedAt">Updated: {{ card.updatedAt | date: 'short' }}</small>
+      </span>
     </div>
   </div>
 </div>

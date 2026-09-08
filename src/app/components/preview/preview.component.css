@@ -8,195 +8,195 @@
   margin-bottom: 20px;
 }
 
-.card {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  max-width: 300px;
+/* ------------------------------------------------------------------ *
+ * Battlegrounds-style card
+ * Ported from bgproyect-web-client / src/components/GameCard.vue
+ * ------------------------------------------------------------------ */
+.bg-card {
+  position: relative;
+  width: 300px;
+  height: 420px;
   margin: 0 auto;
-  border: 2px solid #333;
+  color: #fff;
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
 }
 
-.card-header {
-  width: 100%;
-  height: 200px;
-  overflow: hidden;
-  background: #000;
+/* Minion art, masked with the same shape used by the web client */
+.bg-card__art {
+  position: absolute;
+  bottom: -70px;
+  left: 15px;
+  width: 395px;
+  height: 529px;
+  object-fit: cover;
+  -webkit-mask-image: url("/assets/mask2.png");
+  mask-image: url("/assets/mask2.png");
+  -webkit-mask-size: auto 450px;
+  mask-size: auto 450px;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
 }
 
-.card-header img {
+/* Card frame drawn on top of the art */
+.bg-card__frame {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  z-index: 1;
+  pointer-events: none;
+  user-select: none;
 }
 
-.card-title {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 15px;
+/* Tier / level badge (bg-purple-700 / text-yellow-300) */
+.bg-card__tier {
+  position: absolute;
+  top: 32px;
+  left: 28px;
+  width: 28px;
+  height: 28px;
+  background: #6b21a8;
+  color: #fde047;
+  font-size: 1.125rem;
+  line-height: 28px;
   text-align: center;
+  font-weight: 700;
+  border-radius: 9999px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  z-index: 2;
 }
 
-.card-title h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: bold;
+.bg-card__name {
+  position: absolute;
+  bottom: 182px;
+  width: 100%;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff4cc;
+  filter: drop-shadow(1px 1px 2px #000);
+  transform: rotate(-6deg);
+  z-index: 2;
 }
 
-.card-races {
+.bg-card__text {
+  position: absolute;
+  bottom: 102px;
+  left: 17%;
+  width: 66.6667%;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #fff;
+  filter: drop-shadow(1px 1px 2px #000);
+  z-index: 2;
+}
+
+.bg-card__attack {
+  position: absolute;
+  left: 36px;
+  bottom: 24px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  filter: drop-shadow(1px 1px 3px #000);
+  z-index: 2;
+}
+
+.bg-card__health {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  filter: drop-shadow(1px 1px 3px #000);
+  z-index: 2;
+}
+
+/* ------------------------------------------------------------------ *
+ * Editor-only details (not part of the in-game card)
+ * ------------------------------------------------------------------ */
+.card-extra {
+  max-width: 300px;
+  margin: 24px auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-extra__row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-extra__label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #888;
+}
+
+.card-extra__chips {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  padding: 10px;
-  background: #f0f0f0;
-  justify-content: center;
 }
 
 .race-badge {
   background: #e3f2fd;
   border: 1px solid #90caf9;
   border-radius: 12px;
-  padding: 4px 10px;
+  padding: 3px 9px;
   font-size: 12px;
   font-weight: 500;
   color: #0066cc;
 }
 
-.card-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0;
-  background: white;
-  border-top: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
-}
-
-.stat {
-  text-align: center;
-  padding: 12px;
-  border-right: 1px solid #ddd;
-}
-
-.stat:last-child {
-  border-right: none;
-}
-
-.stat-label {
-  display: block;
-  font-size: 11px;
-  font-weight: bold;
-  color: #666;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-.stat-value {
-  display: block;
-  font-size: 20px;
-  font-weight: bold;
-  color: #333;
-}
-
-.card-description {
-  padding: 15px;
-  background: white;
-  border-bottom: 1px solid #ddd;
-  min-height: 60px;
-}
-
-.card-description p {
-  margin: 0;
-  font-size: 13px;
-  color: #555;
-  line-height: 1.4;
-}
-
-.card-buffs,
-.card-effects {
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
-  background: white;
-}
-
-.effects-title {
-  font-weight: bold;
+.effect-chip {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 6px;
+  padding: 4px 8px;
+  border-radius: 4px;
   font-size: 12px;
+  font-weight: 600;
   color: #333;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 4px;
-}
-
-.effects-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.effect-item {
-  font-size: 12px;
-  padding: 6px;
-  border-radius: 3px;
   border-left: 3px solid #0066cc;
 }
 
-.effect-item.buff {
+.effect-chip.buff {
   background: #fffbf0;
   border-left-color: #ff9800;
 }
 
-.effect-item.effect {
+.effect-chip.effect {
   background: #f0f8ff;
   border-left-color: #2196f3;
 }
 
-.effect-item strong {
-  display: block;
-  margin-bottom: 2px;
-  color: #333;
-}
-
-.effect-item small {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.param {
+.effect-chip small {
+  font-weight: 400;
+  color: #666;
   background: rgba(0, 0, 0, 0.05);
-  padding: 2px 4px;
+  padding: 1px 4px;
   border-radius: 2px;
   font-size: 10px;
-  color: #555;
 }
 
-.card-footer {
-  padding: 10px;
-  background: #f9f9f9;
-  text-align: center;
-  border-top: 1px solid #ddd;
+.card-extra__meta {
+  display: flex;
+  flex-direction: column;
   font-size: 11px;
   color: #999;
-}
-
-.card-footer small {
-  display: block;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .preview-container {
     max-width: 100%;
-  }
-
-  .card {
-    max-width: 100%;
-  }
-
-  .card-header {
-    height: 150px;
   }
 }
