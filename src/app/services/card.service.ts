@@ -12,6 +12,13 @@ import {
   mapParametersForApi
 } from './api-mappers';
 
+export interface CardListPage {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Card[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -31,8 +38,18 @@ export class CardService {
   /**
    * Get the list of all cards (paginated)
    */
-  listCards(page: number = 1): Observable<any> {
-    return this.http.get(`${this.apiUrl}/?page=${page}`);
+  listCards(page: number = 1): Observable<CardListPage> {
+    return this.http.get<any>(`${this.apiUrl}/?page=${page}`).pipe(
+      map(response => {
+        const results = Array.isArray(response) ? response : (response.results ?? []);
+        return {
+          count: response.count ?? results.length,
+          next: response.next ?? null,
+          previous: response.previous ?? null,
+          results: results.map(mapCardFromApi)
+        };
+      })
+    );
   }
 
   /**

@@ -1,0 +1,93 @@
+<div class="list-container">
+  <div class="list-header">
+    <h1>Cards</h1>
+    <div class="list-header__actions">
+      <div class="view-toggle">
+        <button
+          type="button"
+          class="view-toggle__btn"
+          [class.active]="viewMode === 'grid'"
+          (click)="setViewMode('grid')"
+          title="Grid view"
+        >▦ Grid</button>
+        <button
+          type="button"
+          class="view-toggle__btn"
+          [class.active]="viewMode === 'list'"
+          (click)="setViewMode('list')"
+          title="List view"
+        >☰ List</button>
+      </div>
+      <button type="button" class="btn-create" (click)="createCard()">+ New Card</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    Loading...
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <strong>Error:</strong> {{ error }}
+  </div>
+
+  <div *ngIf="!loading && !error && cards.length === 0" class="empty-message">
+    No cards yet. Create the first one!
+  </div>
+
+  <!-- Grid view: full card visuals -->
+  <div *ngIf="!loading && cards.length > 0 && viewMode === 'grid'" class="card-grid">
+    <button
+      type="button"
+      class="card-tile"
+      *ngFor="let card of cards"
+      (click)="editCard(card)"
+    >
+      <div class="card-tile__visual">
+        <app-game-card [card]="card"></app-game-card>
+      </div>
+      <div class="card-tile__info">
+        <strong class="card-tile__title">{{ card.title || '(Untitled)' }}</strong>
+        <p class="card-tile__description" *ngIf="card.description">{{ card.description }}</p>
+      </div>
+    </button>
+  </div>
+
+  <!-- List view: compact rows -->
+  <div *ngIf="!loading && cards.length > 0 && viewMode === 'list'" class="card-rows">
+    <button
+      type="button"
+      class="card-row"
+      *ngFor="let card of cards"
+      (click)="editCard(card)"
+    >
+      <div class="card-row__visual">
+        <app-game-card [card]="card"></app-game-card>
+      </div>
+      <div class="card-row__info">
+        <strong class="card-row__title">{{ card.title || '(Untitled)' }}</strong>
+        <p class="card-row__description" *ngIf="card.description">{{ card.description }}</p>
+      </div>
+      <div class="card-row__stats">
+        <span class="card-row__stat">Lv {{ card.level }}</span>
+        <span class="card-row__stat">ATK {{ card.attack }}</span>
+        <span class="card-row__stat">HP {{ card.health }}</span>
+      </div>
+    </button>
+  </div>
+
+  <div *ngIf="!loading && totalPages > 1" class="pagination">
+    <button type="button" [disabled]="!hasPrevious" (click)="previousPage()">‹ Previous</button>
+
+    <span class="pagination__pages">
+      <button
+        type="button"
+        *ngFor="let pageNumber of pageNumbers"
+        class="pagination__page-btn"
+        [class.active]="pageNumber === page"
+        (click)="goToPage(pageNumber)"
+      >{{ pageNumber }}</button>
+    </span>
+
+    <button type="button" [disabled]="!hasNext" (click)="nextPage()">Next ›</button>
+  </div>
+</div>

@@ -1,0 +1,36 @@
+<!-- Battlegrounds-style card (matches bgproyect-web-client) -->
+<div class="bg-card">
+  <!-- Masked art: the oval mask lives on the full-card wrapper, the image
+       itself is fitted into the oval's box so it shows whole -->
+  <div class="bg-card__art" *ngIf="imageSrc">
+    <img
+      class="bg-card__art-img"
+      [src]="imageSrc"
+      alt="Card art"
+      draggable="false"
+    />
+  </div>
+
+  <!-- Card frame overlay -->
+  <img
+    class="bg-card__frame"
+    src="/assets/card.png"
+    alt="Card frame"
+    draggable="false"
+  />
+
+  <!-- Tier / level badge -->
+  <div class="bg-card__tier">{{ card.level }}</div>
+
+  <!-- Name -->
+  <div class="bg-card__name">{{ card.title || '(Title)' }}</div>
+
+  <!-- Body text -->
+  <div class="bg-card__text">{{ card.description }}</div>
+
+  <!-- Attack -->
+  <div class="bg-card__attack">{{ card.attack }}</div>
+
+  <!-- Health -->
+  <div class="bg-card__health">{{ card.health }}</div>
+</div>

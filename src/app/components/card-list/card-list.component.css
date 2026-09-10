@@ -1,0 +1,282 @@
+.list-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.list-header h1 {
+  color: #333;
+  margin: 0;
+}
+
+.list-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.view-toggle {
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.view-toggle__btn {
+  background: #fff;
+  border: none;
+  padding: 8px 14px;
+  font-size: 14px;
+  color: #555;
+  cursor: pointer;
+}
+
+.view-toggle__btn + .view-toggle__btn {
+  border-left: 1px solid #ccc;
+}
+
+.view-toggle__btn.active {
+  background: #e8f5e9;
+  color: #256428;
+  font-weight: 600;
+}
+
+.btn-create {
+  background-color: #2e7d32;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 18px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.btn-create:hover {
+  background-color: #256428;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #666;
+}
+
+.error-message {
+  background-color: #fee;
+  border: 1px solid #faa;
+  color: #c33;
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 60px 20px;
+  color: #888;
+  font-size: 16px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+  gap: 20px;
+  justify-items: center;
+}
+
+.card-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 165px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 12px;
+  text-align: left;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.card-tile:hover {
+  transform: translateY(-4px);
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
+}
+
+/* The card visual is authored at a fixed 300x420 box (see game-card
+ * component); it's scaled down uniformly to fit the grid thumbnail. */
+.card-tile__visual {
+  width: 165px;
+  height: 231px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.card-tile__visual app-game-card {
+  display: block;
+  transform: scale(0.55);
+  transform-origin: top left;
+}
+
+.card-tile__info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-tile__title {
+  color: #222;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-tile__description {
+  margin: 0;
+  color: #666;
+  font-size: 12px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px 16px 8px 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.card-row:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  border-color: #bbb;
+}
+
+/* Same 300x420 card visual as the grid view, scaled down to a small avatar. */
+.card-row__visual {
+  flex: 0 0 auto;
+  width: 60px;
+  height: 84px;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.card-row__visual app-game-card {
+  display: block;
+  transform: scale(0.2);
+  transform-origin: top left;
+}
+
+.card-row__info {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-row__title {
+  color: #222;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-row__description {
+  margin: 0;
+  color: #666;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-row__stats {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 10px;
+}
+
+.card-row__stat {
+  background: #f2f2f2;
+  color: #555;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.pagination > button {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.pagination > button:disabled {
+  color: #bbb;
+  cursor: not-allowed;
+}
+
+.pagination__pages {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pagination__page-btn {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 36px;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: #555;
+}
+
+.pagination__page-btn.active {
+  background: #2e7d32;
+  border-color: #2e7d32;
+  color: #fff;
+  font-weight: 600;
+}

@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Observable, Subject, of } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
 import { CardService } from '../../services/card.service';
@@ -12,7 +12,7 @@ import { PreviewComponent } from '../preview/preview.component';
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [CommonModule, FormComponent, PreviewComponent],
+  imports: [CommonModule, RouterModule, FormComponent, PreviewComponent],
   templateUrl: './editor.component.html',
   styleUrls: ['./editor.component.css']
 })
@@ -30,9 +30,17 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private cardService: CardService,
     private configService: ConfigService
   ) {}
+
+  /**
+   * Navigate back to the card list
+   */
+  goToList(): void {
+    this.router.navigate(['/']);
+  }
 
   ngOnInit(): void {
     // Determine the mode (create or edit) from the route
